@@ -19,7 +19,7 @@
           @dragend="dragEnd($event, index)"
           @click="toggleWidget(index)"
         >
-          <div class="widget" v-if="agent.visible">
+          <div class="widget" v-if="agent.visible" @click.stop>
             <elevenlabs-convai :agent-id="agent.id"></elevenlabs-convai>
           </div>
         </div>
@@ -43,7 +43,7 @@ export default {
         { id: "Hd79ohSgVoA9LkZcEhRG", visible: false }
       ],
       positions: [],
-      hasPaid: false,
+      hasPaid: false
     };
   },
   methods: {
@@ -53,36 +53,25 @@ export default {
       );
 
       try {
-        const response = await fetch("/api/create-checkout-session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        });
+        const response = await fetch(
+          "https://assistents.vercel.app/api/create-checkout-session",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+          }
+        );
 
         const { id } = await response.json();
-        localStorage.setItem("sessionId", id); // Salvăm `sessionId` în localStorage
-        await stripe.redirectToCheckout({ sessionId: id });
-      } catch (error) {
-        console.error("Error during payment:", error.message);
-      }
-    },
-    async checkPaymentStatus() {
-      try {
-        const sessionId = localStorage.getItem("sessionId");
-        if (!sessionId) {
-          console.error("Session ID is missing.");
-          return;
-        }
+        const result = await stripe.redirectToCheckout({ sessionId: id });
 
-        const response = await fetch(`/api/check-payment-status?sessionId=${sessionId}`);
-        const data = await response.json();
-
-        if (data.hasPaid) {
-          this.hasPaid = true;
+        if (result.error) {
+          alert(result.error.message);
         } else {
-          this.hasPaid = false;
+          localStorage.setItem("hasPaid", true);
+          this.hasPaid = true;
         }
       } catch (error) {
-        console.error("Error checking payment status:", error.message);
+        console.error("Error during payment: ", error);
       }
     },
     toggleWidget(index) {
@@ -110,7 +99,7 @@ export default {
     document.body.appendChild(script);
 
     this.positions = this.agents.map(() => ({ x: 0, y: 0 }));
-    this.checkPaymentStatus(); // Verificăm starea plății la montarea componentului
+    this.hasPaid = localStorage.getItem("hasPaid") === "true";
   }
 };
 </script>
