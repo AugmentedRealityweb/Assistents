@@ -14,15 +14,17 @@
           v-for="(agent, index) in agents"
           :key="index"
           class="circle"
-          draggable="true"
-          @dragstart="dragStart($event, index)"
-          @dragend="dragEnd($event, index)"
           @click="toggleWidget(index)"
         >
           <img :src="agent.circleImage" alt="Agent Circle" class="circle-image" />
         </div>
-        <div class="widget" v-if="agents.some(agent => agent.visible)" @click.stop>
-          <elevenlabs-convai :agent-id="agents.find(agent => agent.visible).id"></elevenlabs-convai>
+      </div>
+      <div v-if="currentAgent" class="widget-container">
+        <div class="widget">
+          <elevenlabs-convai :agent-id="currentAgent.id"></elevenlabs-convai>
+        </div>
+        <div class="agent-description">
+          <p>{{ currentAgent.description }}</p>
         </div>
       </div>
     </div>
@@ -37,33 +39,41 @@ export default {
     return {
       agents: [
         {
-          id: "5mz0QGMTS6vciobpmiXO",
-          visible: false,
-          background: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp",
-          circleImage: "./poza2.png",
-        },
-        {
-          id: "sNEfrsQUklzPW2Hu6VGg",
-          visible: false,
-          background: "https://i.giphy.com/iIYcg9qJtPn34twSLU.webp",
-          circleImage: "./poza3.png",
+          id: "Hd79ohSgVoA9LkZcEhRG",
+          name: "Angela",
+          description:
+            "Angela este seducția întruchipată – cu o voce caldă și un aer jucăuș, știe exact cum să te facă să zâmbești și să-ți simți inima bătând mai repede.",
+          background: "https://i.giphy.com/xULW8LuH8tqB4H0Egg.webp",
+          circleImage: "./poza.png",
         },
         {
           id: "EU4z5Ma0f0dHLY6m9KSq",
-          visible: false,
+          name: "Patricia",
+          description:
+            "Patricia are un farmec irezistibil - Jucăușă și fermecătoare, își folosește inteligența și căldura pentru a te captiva complet.",
           background: "https://i.giphy.com/xTg8Bd9jyppDHgvjQQ.webp",
           circleImage: "./poza4.png",
         },
         {
-          id: "Hd79ohSgVoA9LkZcEhRG",
-          visible: false,
-          background: "https://i.giphy.com/xULW8LuH8tqB4H0Egg.webp",
-          circleImage: "./poza.png",
+          id: "sNEfrsQUklzPW2Hu6VGg",
+          name: "Alexandra",
+          description:
+            "Alexandra este o enigmă fascinantă - cu o voce catifelată care îți atinge sufletul și îți aprinde imaginația.",
+          background: "https://i.giphy.com/iIYcg9qJtPn34twSLU.webp",
+          circleImage: "./poza3.png",
+        },
+        {
+          id: "5mz0QGMTS6vciobpmiXO",
+          name: "Claudia",
+          description:
+            "Claudia este senzualitatea întruchipată – o combinație perfectă de îndrăzneală și rafinament. Vocea ei îți mângâie simțurile, în timp ce spiritul ei glumeț îți aprinde dorința de a o cunoaște mai bine.",
+          background: "https://i.giphy.com/TyijeM6uaGY00.webp",
+          circleImage: "./poza2.png",
         },
       ],
-      positions: [],
       hasPaid: false,
-      currentBackground: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp", // Fundal implicit
+      currentBackground: "https://i.giphy.com/TyijeM6uaGY00.webp",
+      currentAgent: null,
     };
   },
   methods: {
@@ -79,7 +89,7 @@ export default {
         });
 
         const { id } = await response.json();
-        localStorage.setItem("sessionId", id); // Salvăm `sessionId` în localStorage
+        localStorage.setItem("sessionId", id);
         await stripe.redirectToCheckout({ sessionId: id });
       } catch (error) {
         console.error("Error during payment:", error.message);
@@ -111,24 +121,12 @@ export default {
       this.agents.forEach((agent, idx) => {
         if (index === idx) {
           agent.visible = !agent.visible;
+          this.currentAgent = agent.visible ? agent : null;
           this.currentBackground = agent.background;
         } else {
           agent.visible = false;
         }
       });
-    },
-    dragStart(event, index) {
-      event.dataTransfer.setData("index", index);
-    },
-    dragEnd(event, index) {
-      const container = event.target.parentNode;
-      const rect = container.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-      this.positions[index] = { x, y };
-      event.target.style.position = "absolute";
-      event.target.style.left = `${x}px`;
-      event.target.style.top = `${y}px`;
     },
   },
   mounted() {
@@ -138,8 +136,7 @@ export default {
     script.type = "text/javascript";
     document.body.appendChild(script);
 
-    this.positions = this.agents.map(() => ({ x: 0, y: 0 }));
-    this.checkPaymentStatus(); // Verificăm starea plății la montarea componentului
+    this.checkPaymentStatus();
   },
 };
 </script>
@@ -155,7 +152,6 @@ export default {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  border: 5px solid black;
   box-sizing: border-box;
   overflow: hidden;
   position: relative;
@@ -200,7 +196,7 @@ export default {
 
 .circle-container {
   position: absolute;
-  top: 20%;
+  top: 30%;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -214,7 +210,6 @@ export default {
   border-radius: 50%;
   cursor: pointer;
   background-color: rgba(255, 255, 255, 0.8);
-  animation: float 7s ease-in-out infinite;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -229,6 +224,17 @@ export default {
   object-fit: cover;
 }
 
+.widget-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
 .widget {
   position: fixed;
   top: 46%;
@@ -237,15 +243,9 @@ export default {
   z-index: 1000;
 }
 
-@keyframes float {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-  100% {
-    transform: translateY(0);
-  }
+.agent-description {
+  font-size: 1.2rem;
+  color: white;
+  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
 }
 </style>
