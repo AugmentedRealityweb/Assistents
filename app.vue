@@ -254,7 +254,7 @@ export default {
   position: fixed;
   bottom: 20px;
   left: 50%;
-  transform: scale(2);
+  transform: scale(2.5);
   background: rgba(0, 0, 0, 0.8);
   color: white;
   padding: 5px 15px;
@@ -262,7 +262,7 @@ export default {
   max-width: 70%;
   text-align: justify;
   font-size: 2rem;
-  line-height: 1.4;
+  line-height: 1.7;
   white-space: normal;
   word-wrap: break-word;
 }
