@@ -40,8 +40,9 @@ export default {
         { id: "5mz0QGMTS6vciobpmiXO", visible: false },
         { id: "sNEfrsQUklzPW2Hu6VGg", visible: false },
         { id: "EU4z5Ma0f0dHLY6m9KSq", visible: false },
-        { id: "Hd79ohSgVoA9LkZcEhRG", visible: false },
+        { id: "Hd79ohSgVoA9LkZcEhRG", visible: false }
       ],
+      positions: [],
       hasPaid: false,
     };
   },
@@ -52,22 +53,36 @@ export default {
       );
 
       try {
-        const response = await fetch(
-          "https://assistents.vercel.app/api/create-checkout-session",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-          }
-        );
+        const response = await fetch("/api/create-checkout-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
 
         const { id } = await response.json();
-        const result = await stripe.redirectToCheckout({ sessionId: id });
+        localStorage.setItem("sessionId", id); // Salvăm `sessionId` în localStorage
+        await stripe.redirectToCheckout({ sessionId: id });
+      } catch (error) {
+        console.error("Error during payment:", error.message);
+      }
+    },
+    async checkPaymentStatus() {
+      try {
+        const sessionId = localStorage.getItem("sessionId");
+        if (!sessionId) {
+          console.error("Session ID is missing.");
+          return;
+        }
 
-        if (result.error) {
-          alert(result.error.message);
+        const response = await fetch(`/api/check-payment-status?sessionId=${sessionId}`);
+        const data = await response.json();
+
+        if (data.hasPaid) {
+          this.hasPaid = true;
+        } else {
+          this.hasPaid = false;
         }
       } catch (error) {
-        console.error("Error during payment: ", error);
+        console.error("Error checking payment status:", error.message);
       }
     },
     toggleWidget(index) {
@@ -85,23 +100,7 @@ export default {
       event.target.style.position = "absolute";
       event.target.style.left = `${x}px`;
       event.target.style.top = `${y}px`;
-    },
-    async checkPaymentStatus() {
-      try {
-        const response = await fetch(
-          "https://assistents.vercel.app/api/check-payment-status",
-          {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-
-        const data = await response.json();
-        this.hasPaid = data.hasPaid;
-      } catch (error) {
-        console.error("Error checking payment status:", error);
-      }
-    },
+    }
   },
   mounted() {
     const script = document.createElement("script");
@@ -110,8 +109,9 @@ export default {
     script.type = "text/javascript";
     document.body.appendChild(script);
 
-    this.checkPaymentStatus(); // Verifică statusul plății la montarea aplicației.
-  },
+    this.positions = this.agents.map(() => ({ x: 0, y: 0 }));
+    this.checkPaymentStatus(); // Verificăm starea plății la montarea componentului
+  }
 };
 </script>
 
