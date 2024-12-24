@@ -261,7 +261,7 @@ export default {
   border-radius: 8px;
   max-width: 70%;
   text-align: justify;
-  font-size: 1.2rem;
+  font-size: 2rem;
   line-height: 1.4;
   white-space: normal;
   word-wrap: break-word;
