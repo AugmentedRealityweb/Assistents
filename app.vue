@@ -18,8 +18,8 @@
           @dragstart="dragStart($event, index)"
           @dragend="dragEnd($event, index)"
           @click="toggleWidget(index)"
-          :style="{ backgroundImage: `url(${agent.circleImage})`, backgroundSize: 'cover' }"
         >
+          <img :src="agent.circleImage" alt="Agent Circle" class="circle-image" />
           <div class="widget" v-if="agent.visible" @click.stop>
             <elevenlabs-convai :agent-id="agent.id"></elevenlabs-convai>
           </div>
@@ -220,6 +220,13 @@ export default {
   align-items: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   position: relative;
+}
+
+.circle-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .widget {
