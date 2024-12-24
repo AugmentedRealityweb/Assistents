@@ -19,7 +19,7 @@
           @dragend="dragEnd($event, index)"
           @click="toggleWidget(index)"
         >
-          <div class="widget" v-if="agent.visible">
+          <div class="widget" v-if="agent.visible" @click.stop>
             <elevenlabs-convai :agent-id="agent.id"></elevenlabs-convai>
           </div>
         </div>
@@ -43,7 +43,7 @@ export default {
         { id: "Hd79ohSgVoA9LkZcEhRG", visible: false }
       ],
       positions: [],
-      hasPaid: false,
+      hasPaid: false
     };
   },
   methods: {
@@ -55,7 +55,7 @@ export default {
       try {
         const response = await fetch("/api/create-checkout-session", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json" }
         });
 
         const { id } = await response.json();
@@ -73,7 +73,9 @@ export default {
           return;
         }
 
-        const response = await fetch(`/api/check-payment-status?sessionId=${sessionId}`);
+        const response = await fetch(
+          `/api/check-payment-status?sessionId=${sessionId}`
+        );
         const data = await response.json();
 
         if (data.hasPaid) {
