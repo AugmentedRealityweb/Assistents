@@ -200,7 +200,7 @@ export default {
 
 .circle-container {
   position: absolute;
-  bottom: 480px;
+  bottom: 450px;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -208,8 +208,8 @@ export default {
 }
 
 .circle {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   border: 2px solid white;
   border-radius: 50%;
   cursor: pointer;
@@ -231,7 +231,7 @@ export default {
 
 .widget {
   position: absolute;
-  top: -10px;
+  bottom: -10px;
   left: 400%;
   transform: translateX(-50%);
 }
