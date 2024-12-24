@@ -1,5 +1,6 @@
 const express = require("express");
-const stripe = require("stripe")("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"); // Înlocuiește cu cheia ta secretă Stripe
+const stripe = require("stripe")("const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+"); // Înlocuiește cu cheia ta secretă Stripe
 const cors = require("cors");
 
 const app = express();
