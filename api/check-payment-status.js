@@ -1,22 +1,31 @@
-// Endpoint pentru verificarea stării de plată
+// Endpoint pentru verificarea stării plății
 import express from "express";
-import bodyParser from "body-parser";
+import Stripe from "stripe";
 
-const app = express();
-app.use(bodyParser.json());
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const router = express.Router();
 
-// Variabila pentru stocarea stării de plată (doar pentru testare locală)
-let hasPaid = false; // Într-un proiect real, aceasta trebuie salvată într-o bază de date
+router.get("/api/check-payment-status", async (req, res) => {
+  try {
+    // Exemplu: Extrage userId-ul sau alt identificator din query params
+    const { sessionId } = req.query;
 
-app.get("/api/check-payment-status", (req, res) => {
-  // Trimite statusul plății către client
-  res.json({ hasPaid });
+    if (!sessionId) {
+      return res.status(400).json({ error: "Session ID is required." });
+    }
+
+    // Obține detalii despre sesiunea de plată
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+    if (session.payment_status === "paid") {
+      return res.status(200).json({ hasPaid: true });
+    } else {
+      return res.status(200).json({ hasPaid: false });
+    }
+  } catch (error) {
+    console.error("Eroare la verificarea statusului plății:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
-app.post("/api/mark-as-paid", (req, res) => {
-  // Endpoint pentru a marca manual statusul ca "plătit"
-  hasPaid = true;
-  res.status(200).send("Statusul plății a fost actualizat.");
-});
-
-export default app;
+export default router;
