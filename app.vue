@@ -231,7 +231,7 @@ export default {
 
 .widget {
   position: absolute;
-  bottom: -10px;
+  bottom: -20px;
   left: 400%;
   transform: translateX(-50%);
 }
