@@ -230,16 +230,16 @@ export default {
   color: white;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  width: 80%; /* Adjust width for horizontal alignment */
-  max-width: 900px; /* Add a maximum width for larger screens */
+  width: 80%; /* Ensures the width spans a good horizontal space */
+  max-width: 900px; /* Restricts the width for readability */
   margin: 0 auto;
   font-size: 1.2rem;
   position: fixed;
-  bottom: 5%; /* Ensure it stays at the bottom */
+  bottom: 5%; /* Positions the description box at the bottom */
   left: 50%;
   transform: translateX(-50%);
-  text-align: center; /* Ensure text is centrally aligned */
-  white-space: normal; /* Ensure proper line breaking */
-  line-height: 1.5; /* Improve readability */
+  text-align: center; /* Centers the text inside the box */
+  white-space: normal; /* Allows the text to wrap */
+  line-height: 1.5; /* Improves line spacing for readability */
 }
 </style>
