@@ -1,10 +1,6 @@
 <template>
   <div id="app">
-    <div class="container">
-      <video autoplay muted loop class="background-video">
-        <source src="/video.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
+    <div class="container" :style="{ backgroundImage: `url(${backgroundImage})` }">
       <div class="header">
         <h1>Virtual Assistant Hub</h1>
         <p>Select an assistant by clicking on a circle below.</p>
@@ -38,6 +34,8 @@ import { loadStripe } from "@stripe/stripe-js";
 export default {
   data() {
     return {
+      backgroundImage:
+        "https://i.giphy.com/xULW8LuH8tqB4H0Egg.webp",
       agents: [
         { id: "5mz0QGMTS6vciobpmiXO", visible: false },
         { id: "sNEfrsQUklzPW2Hu6VGg", visible: false },
@@ -55,25 +53,38 @@ export default {
       );
 
       try {
-        const response = await fetch(
-          "https://assistents.vercel.app/api/create-checkout-session",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" }
-          }
-        );
+        const response = await fetch("/api/create-checkout-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" }
+        });
 
         const { id } = await response.json();
-        const result = await stripe.redirectToCheckout({ sessionId: id });
+        localStorage.setItem("sessionId", id); // Salvăm `sessionId` în localStorage
+        await stripe.redirectToCheckout({ sessionId: id });
+      } catch (error) {
+        console.error("Error during payment:", error.message);
+      }
+    },
+    async checkPaymentStatus() {
+      try {
+        const sessionId = localStorage.getItem("sessionId");
+        if (!sessionId) {
+          console.error("Session ID is missing.");
+          return;
+        }
 
-        if (result.error) {
-          alert(result.error.message);
-        } else {
-          localStorage.setItem("hasPaid", true);
+        const response = await fetch(
+          `/api/check-payment-status?sessionId=${sessionId}`
+        );
+        const data = await response.json();
+
+        if (data.hasPaid) {
           this.hasPaid = true;
+        } else {
+          this.hasPaid = false;
         }
       } catch (error) {
-        console.error("Error during payment: ", error);
+        console.error("Error checking payment status:", error.message);
       }
     },
     toggleWidget(index) {
@@ -101,11 +112,10 @@ export default {
     document.body.appendChild(script);
 
     this.positions = this.agents.map(() => ({ x: 0, y: 0 }));
-    this.hasPaid = localStorage.getItem("hasPaid") === "true";
+    this.checkPaymentStatus(); // Verificăm starea plății la montarea componentului
   }
 };
 </script>
-
 <style scoped>
 .container {
   display: flex;
@@ -114,24 +124,20 @@ export default {
   align-items: center;
   width: 100vw;
   height: 100vh;
-  position: relative;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 5px solid black;
+  box-sizing: border-box;
   overflow: hidden;
-}
-
-.background-video {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: -1;
+  position: relative;
+  color: white;
+  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
 }
 
 .header {
   margin-top: 20px;
   text-align: center;
-  color: white;
 }
 
 .header h1 {
