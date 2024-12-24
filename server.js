@@ -39,10 +39,26 @@ app.post("/api/create-checkout-session", async (req, res) => {
 });
 
 // Endpoint pentru verificarea stării plății
-app.get("/api/check-payment-status", (req, res) => {
-  // Exemplu: verifică baza de date sau o logică specifică
-  const hasPaid = true; // Modifică pentru a returna starea reală
-  res.json({ hasPaid });
+app.get("/api/check-payment-status", async (req, res) => {
+  try {
+    const { sessionId } = req.query;
+
+    if (!sessionId) {
+      return res.status(400).json({ error: "Session ID is required." });
+    }
+
+    // Obține detalii despre sesiunea de plată
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+    if (session.payment_status === "paid") {
+      return res.status(200).json({ hasPaid: true });
+    } else {
+      return res.status(200).json({ hasPaid: false });
+    }
+  } catch (error) {
+    console.error("Eroare la verificarea statusului plății:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 // Endpoint pentru webhook Stripe
