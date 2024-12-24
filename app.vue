@@ -35,7 +35,7 @@ export default {
   data() {
     return {
       backgroundImage:
-        "https://www.instagram.com/reel/DDy6dH4homq/",
+        "https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Fzlx4bhx1aq701.gif&rdt=45849",
       agents: [
         { id: "5mz0QGMTS6vciobpmiXO", visible: false },
         { id: "sNEfrsQUklzPW2Hu6VGg", visible: false },
