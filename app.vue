@@ -200,7 +200,7 @@ export default {
 
 .circle-container {
   position: absolute;
-  top: 20px;
+  top: 40px;
   width: 100%;
   display: flex;
   justify-content: center;
