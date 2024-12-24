@@ -242,5 +242,4 @@ export default {
   top: 70%; /* Sau valoarea dorită */
   left: 50%; /* Sau valoarea dorită */
 }
-}
 </style>
