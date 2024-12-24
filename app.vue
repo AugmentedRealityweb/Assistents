@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div class="container" :style="{ backgroundImage: `url(${backgroundImage})` }">
+    <div class="container" :style="{ backgroundImage: `url(${currentBackground})` }">
       <div class="header">
         <h1>Virtual Assistant Hub</h1>
         <p>Select an assistant by clicking on a circle below.</p>
@@ -34,16 +34,31 @@ import { loadStripe } from "@stripe/stripe-js";
 export default {
   data() {
     return {
-      backgroundImage:
-        "https://i.giphy.com/xULW8LuH8tqB4H0Egg.webp",
       agents: [
-        { id: "5mz0QGMTS6vciobpmiXO", visible: false },
-        { id: "sNEfrsQUklzPW2Hu6VGg", visible: false },
-        { id: "EU4z5Ma0f0dHLY6m9KSq", visible: false },
-        { id: "Hd79ohSgVoA9LkZcEhRG", visible: false }
+        {
+          id: "5mz0QGMTS6vciobpmiXO",
+          visible: false,
+          background: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp",
+        },
+        {
+          id: "sNEfrsQUklzPW2Hu6VGg",
+          visible: false,
+          background: "https://i.giphy.com/iIYcg9qJtPn34twSLU.webp",
+        },
+        {
+          id: "EU4z5Ma0f0dHLY6m9KSq",
+          visible: false,
+          background: "https://i.giphy.com/xTg8Bd9jyppDHgvjQQ.webp",
+        },
+        {
+          id: "Hd79ohSgVoA9LkZcEhRG",
+          visible: false,
+          background: "https://i.giphy.com/xULW8LuH8tqB4H0Egg.webp",
+        },
       ],
       positions: [],
-      hasPaid: false
+      hasPaid: false,
+      currentBackground: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp", // Fundal implicit
     };
   },
   methods: {
@@ -55,7 +70,7 @@ export default {
       try {
         const response = await fetch("/api/create-checkout-session", {
           method: "POST",
-          headers: { "Content-Type": "application/json" }
+          headers: { "Content-Type": "application/json" },
         });
 
         const { id } = await response.json();
@@ -88,7 +103,14 @@ export default {
       }
     },
     toggleWidget(index) {
-      this.agents[index].visible = !this.agents[index].visible;
+      this.agents.forEach((agent, idx) => {
+        if (index === idx) {
+          agent.visible = !agent.visible;
+          this.currentBackground = agent.background;
+        } else {
+          agent.visible = false;
+        }
+      });
     },
     dragStart(event, index) {
       event.dataTransfer.setData("index", index);
@@ -102,7 +124,7 @@ export default {
       event.target.style.position = "absolute";
       event.target.style.left = `${x}px`;
       event.target.style.top = `${y}px`;
-    }
+    },
   },
   mounted() {
     const script = document.createElement("script");
@@ -113,9 +135,10 @@ export default {
 
     this.positions = this.agents.map(() => ({ x: 0, y: 0 }));
     this.checkPaymentStatus(); // Verificăm starea plății la montarea componentului
-  }
+  },
 };
 </script>
+
 <style scoped>
 .container {
   display: flex;
