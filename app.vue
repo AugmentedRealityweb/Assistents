@@ -265,6 +265,8 @@ export default {
   line-height: 1.7;
   white-space: normal;
   word-wrap: break-word;
+  width: 100%;
+  height: 100%;
 }
 
 @keyframes float {
