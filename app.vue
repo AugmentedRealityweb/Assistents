@@ -18,13 +18,9 @@
         >
           <img :src="agent.circleImage" alt="Agent Circle" class="circle-image" />
         </div>
-      </div>
-      <div v-if="currentAgent" class="widget-container">
-        <div class="widget">
-          <elevenlabs-convai :agent-id="currentAgent.id"></elevenlabs-convai>
-        </div>
-        <div class="agent-description">
-          <p>{{ currentAgent.description }}</p>
+        <div class="widget" v-if="agents.some(agent => agent.visible)">
+          <elevenlabs-convai :agent-id="agents.find(agent => agent.visible).id"></elevenlabs-convai>
+          <p class="description">{{ agents.find(agent => agent.visible).description }}</p>
         </div>
       </div>
     </div>
@@ -39,41 +35,36 @@ export default {
     return {
       agents: [
         {
-          id: "Hd79ohSgVoA9LkZcEhRG",
-          name: "Angela",
-          description:
-            "Angela este seducția întruchipată – cu o voce caldă și un aer jucăuș, știe exact cum să te facă să zâmbești și să-ți simți inima bătând mai repede.",
-          background: "https://i.giphy.com/xULW8LuH8tqB4H0Egg.webp",
-          circleImage: "./poza.png",
-        },
-        {
-          id: "EU4z5Ma0f0dHLY6m9KSq",
-          name: "Patricia",
-          description:
-            "Patricia are un farmec irezistibil - Jucăușă și fermecătoare, își folosește inteligența și căldura pentru a te captiva complet.",
-          background: "https://i.giphy.com/xTg8Bd9jyppDHgvjQQ.webp",
-          circleImage: "./poza4.png",
+          id: "5mz0QGMTS6vciobpmiXO",
+          visible: false,
+          background: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp",
+          circleImage: "./poza2.png",
+          description: "Claudia este senzualitatea întruchipată– o combinație perfectă de îndrăzneală și rafinament. Vocea ei îți mângâie simțurile, în timp ce spiritul ei glumeț îți aprind dorința de a o cunoaște mai bine."
         },
         {
           id: "sNEfrsQUklzPW2Hu6VGg",
-          name: "Alexandra",
-          description:
-            "Alexandra este o enigmă fascinantă - cu o voce catifelată care îți atinge sufletul și îți aprinde imaginația.",
+          visible: false,
           background: "https://i.giphy.com/iIYcg9qJtPn34twSLU.webp",
           circleImage: "./poza3.png",
+          description: "Alexandra este o enigmă fascinantă - cu o voce catifelată care îți atinge sufletul și îți aprinde imaginația."
         },
         {
-          id: "5mz0QGMTS6vciobpmiXO",
-          name: "Claudia",
-          description:
-            "Claudia este senzualitatea întruchipată – o combinație perfectă de îndrăzneală și rafinament. Vocea ei îți mângâie simțurile, în timp ce spiritul ei glumeț îți aprinde dorința de a o cunoaște mai bine.",
-          background: "https://i.giphy.com/TyijeM6uaGY00.webp",
-          circleImage: "./poza2.png",
+          id: "EU4z5Ma0f0dHLY6m9KSq",
+          visible: false,
+          background: "https://i.giphy.com/xTg8Bd9jyppDHgvjQQ.webp",
+          circleImage: "./poza4.png",
+          description: "Patricia are un farmec irezistibil - Jucăușă și fermecătoare, își folosește inteligența și căldura pentru a te captiva complet."
         },
+        {
+          id: "Hd79ohSgVoA9LkZcEhRG",
+          visible: false,
+          background: "https://i.giphy.com/xULW8LuH8tqB4H0Egg.webp",
+          circleImage: "./poza.png",
+          description: "Angela este seducția întruchipată – cu o voce caldă și un aer jucăuș, știe exact cum să te facă să zâmbești și să-ți simți inima bătând mai repede."
+        }
       ],
       hasPaid: false,
-      currentBackground: "https://i.giphy.com/TyijeM6uaGY00.webp",
-      currentAgent: null,
+      currentBackground: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp"
     };
   },
   methods: {
@@ -85,7 +76,7 @@ export default {
       try {
         const response = await fetch("/api/create-checkout-session", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json" }
         });
 
         const { id } = await response.json();
@@ -121,13 +112,12 @@ export default {
       this.agents.forEach((agent, idx) => {
         if (index === idx) {
           agent.visible = !agent.visible;
-          this.currentAgent = agent.visible ? agent : null;
           this.currentBackground = agent.background;
         } else {
           agent.visible = false;
         }
       });
-    },
+    }
   },
   mounted() {
     const script = document.createElement("script");
@@ -137,7 +127,7 @@ export default {
     document.body.appendChild(script);
 
     this.checkPaymentStatus();
-  },
+  }
 };
 </script>
 
@@ -152,6 +142,7 @@ export default {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  border: 5px solid black;
   box-sizing: border-box;
   overflow: hidden;
   position: relative;
@@ -196,7 +187,7 @@ export default {
 
 .circle-container {
   position: absolute;
-  top: 30%;
+  top: 20%;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -214,7 +205,6 @@ export default {
   justify-content: center;
   align-items: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  position: relative;
 }
 
 .circle-image {
@@ -224,28 +214,18 @@ export default {
   object-fit: cover;
 }
 
-.widget-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
 .widget {
   position: fixed;
   top: 46%;
   left: 91%;
   transform: translate(-50%, -50%);
   z-index: 1000;
+  text-align: center;
 }
 
-.agent-description {
-  font-size: 1.2rem;
+.description {
+  margin-top: 20px;
   color: white;
-  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+  font-size: 1.2rem;
 }
 </style>
