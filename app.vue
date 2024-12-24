@@ -50,7 +50,7 @@ export default {
     async handlePayment() {
       const stripe = await loadStripe(
         "pk_live_51LhHVFJOzg3eyu5LJRnplRv2AKh0MGJEew4HhNbn3Eu2LfJkbZUv2j4lFNxulY5ugbb6wrh07QCaX0djdFnQ8f7A00tyuYKXEL"
-      ); // Înlocuiește cu cheia ta publică Stripe
+      );
 
       try {
         const response = await fetch(
@@ -62,16 +62,9 @@ export default {
         );
 
         const { id } = await response.json();
-        const result = await stripe.redirectToCheckout({ sessionId: id });
-
-        if (result.error) {
-          alert(result.error.message);
-        } else {
-          localStorage.setItem("hasPaid", true);
-          this.hasPaid = true;
-        }
+        await stripe.redirectToCheckout({ sessionId: id });
       } catch (error) {
-        console.error("Error during payment: ", error);
+        console.error("Error during payment:", error);
       }
     },
     toggleWidget(index) {
@@ -89,10 +82,24 @@ export default {
       event.target.style.position = "absolute";
       event.target.style.left = `${x}px`;
       event.target.style.top = `${y}px`;
+    },
+    async checkPaymentStatus() {
+      try {
+        const response = await fetch(
+          "https://assistents.vercel.app/api/check-payment-status",
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+          }
+        );
+        const data = await response.json();
+        this.hasPaid = data.hasPaid; // Actualizează starea `hasPaid`
+      } catch (error) {
+        console.error("Error checking payment status:", error);
+      }
     }
   },
   mounted() {
-    // Inject the ElevenLabs script dynamically
     const script = document.createElement("script");
     script.src = "https://elevenlabs.io/convai-widget/index.js";
     script.async = true;
@@ -100,7 +107,7 @@ export default {
     document.body.appendChild(script);
 
     this.positions = this.agents.map(() => ({ x: 0, y: 0 }));
-    this.hasPaid = localStorage.getItem("hasPaid") === "true";
+    this.checkPaymentStatus(); // Verifică starea plății la încărcare
   }
 };
 </script>
