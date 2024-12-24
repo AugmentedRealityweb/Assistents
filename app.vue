@@ -254,7 +254,7 @@ export default {
   position: fixed;
   bottom: 20px;
   left: 50%;
-  transform: scale(1.2);
+  transform: scale(2);
   background: rgba(0, 0, 0, 0.8);
   color: white;
   padding: 5px 15px;
