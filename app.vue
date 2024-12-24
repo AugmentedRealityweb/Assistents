@@ -18,6 +18,7 @@
           @dragstart="dragStart($event, index)"
           @dragend="dragEnd($event, index)"
           @click="toggleWidget(index)"
+          :style="{ backgroundImage: `url(${agent.circleImage})`, backgroundSize: 'cover' }"
         >
           <div class="widget" v-if="agent.visible" @click.stop>
             <elevenlabs-convai :agent-id="agent.id"></elevenlabs-convai>
@@ -39,21 +40,25 @@ export default {
           id: "5mz0QGMTS6vciobpmiXO",
           visible: false,
           background: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp",
+          circleImage: "poza2.png",
         },
         {
           id: "sNEfrsQUklzPW2Hu6VGg",
           visible: false,
           background: "https://i.giphy.com/iIYcg9qJtPn34twSLU.webp",
+          circleImage: "poza3.png",
         },
         {
           id: "EU4z5Ma0f0dHLY6m9KSq",
           visible: false,
           background: "https://i.giphy.com/xTg8Bd9jyppDHgvjQQ.webp",
+          circleImage: "poza4.png",
         },
         {
           id: "Hd79ohSgVoA9LkZcEhRG",
           visible: false,
           background: "https://i.giphy.com/xULW8LuH8tqB4H0Egg.webp",
+          circleImage: "poza.png",
         },
       ],
       positions: [],
