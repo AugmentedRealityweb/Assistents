@@ -251,21 +251,21 @@ export default {
 }
 
 .description {
+  all: unset; /* Elimină toate stilurile implicite */
+  position: fixed; /* Reaplică stilurile tale */
   bottom: -70px;
   left: 50%;
-  transform: scale(2.5);
+  transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.8);
   color: white;
-  padding: 5px 15px;
+  padding: 20px;
   border-radius: 8px;
-  max-width: 70%;
+  font-size: 3rem !important;
+  line-height: 1.5;
   text-align: justify;
-  font-size: 5rem;
-  line-height: 1.7;
+  max-width: 70%;
   white-space: normal;
   word-wrap: break-word;
-  width: 100%;
-  height: 100%;
 }
 
 @keyframes float {
