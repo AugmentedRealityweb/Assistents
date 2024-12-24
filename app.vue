@@ -232,7 +232,7 @@ export default {
 .widget {
   position: fixed;
   top: 50%;
-  left: -50%;
+  left: 100%;
   transform: translate(-50%, -50%);
   z-index: 1000;
 }
