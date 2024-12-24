@@ -20,9 +20,9 @@
           @click="toggleWidget(index)"
         >
           <img :src="agent.circleImage" alt="Agent Circle" class="circle-image" />
-          <div class="widget" v-if="agent.visible" @click.stop>
-            <elevenlabs-convai :agent-id="agent.id"></elevenlabs-convai>
-          </div>
+        </div>
+        <div class="widget" v-if="agents.some(agent => agent.visible)" @click.stop>
+          <elevenlabs-convai :agent-id="agents.find(agent => agent.visible).id"></elevenlabs-convai>
         </div>
       </div>
     </div>
@@ -39,7 +39,7 @@ export default {
         {
           id: "5mz0QGMTS6vciobpmiXO",
           visible: false,
-          background: "https://i.giphy.com/TyijeM6uaGY00.webp",
+          background: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp",
           circleImage: "./poza2.png",
         },
         {
@@ -63,7 +63,7 @@ export default {
       ],
       positions: [],
       hasPaid: false,
-      currentBackground: "https://i.giphy.com/TyijeM6uaGY00.webp", // Fundal implicit
+      currentBackground: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp", // Fundal implicit
     };
   },
   methods: {
@@ -200,7 +200,7 @@ export default {
 
 .circle-container {
   position: absolute;
-  bottom: 450px;
+  top: 20%;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -208,8 +208,8 @@ export default {
 }
 
 .circle {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   border: 2px solid white;
   border-radius: 50%;
   cursor: pointer;
@@ -230,10 +230,11 @@ export default {
 }
 
 .widget {
-  position: absolute;
-  bottom: -120px;
-  left: 400%;
-  transform: translateX(-50%);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
 }
 
 @keyframes float {
