@@ -10,23 +10,23 @@ app.use(cors());
 app.post("/api/create-checkout-session", async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price_data: {
-            currency: "ron",
-            product_data: {
-              name: "Access Fee",
-            },
-            unit_amount: 200, // 1 RON în bani
-          },
-          quantity: 1,
+  payment_method_types: ["card"],
+  line_items: [
+    {
+      price_data: {
+        currency: "ron",
+        product_data: {
+          name: "Access Fee",
         },
-      ],
-      mode: "payment",
-      success_url: `${req.headers.origin}/success`,
-      cancel_url: `${req.headers.origin}/cancel`,
-    });
+        unit_amount: 200, // 2 RON în bani
+      },
+      quantity: 1,
+    },
+  ],
+  mode: "payment",
+  success_url: `${req.headers.origin}/success`,
+  cancel_url: `${req.headers.origin}/cancel`,
+});
 
     res.json({ id: session.id });
   } catch (error) {
