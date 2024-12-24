@@ -40,10 +40,9 @@ export default {
         { id: "5mz0QGMTS6vciobpmiXO", visible: false },
         { id: "sNEfrsQUklzPW2Hu6VGg", visible: false },
         { id: "EU4z5Ma0f0dHLY6m9KSq", visible: false },
-        { id: "Hd79ohSgVoA9LkZcEhRG", visible: false }
+        { id: "Hd79ohSgVoA9LkZcEhRG", visible: false },
       ],
-      positions: [],
-      hasPaid: false
+      hasPaid: false,
     };
   },
   methods: {
@@ -57,14 +56,18 @@ export default {
           "https://assistents.vercel.app/api/create-checkout-session",
           {
             method: "POST",
-            headers: { "Content-Type": "application/json" }
+            headers: { "Content-Type": "application/json" },
           }
         );
 
         const { id } = await response.json();
-        await stripe.redirectToCheckout({ sessionId: id });
+        const result = await stripe.redirectToCheckout({ sessionId: id });
+
+        if (result.error) {
+          alert(result.error.message);
+        }
       } catch (error) {
-        console.error("Error during payment:", error);
+        console.error("Error during payment: ", error);
       }
     },
     toggleWidget(index) {
@@ -89,15 +92,16 @@ export default {
           "https://assistents.vercel.app/api/check-payment-status",
           {
             method: "GET",
-            headers: { "Content-Type": "application/json" }
+            headers: { "Content-Type": "application/json" },
           }
         );
+
         const data = await response.json();
-        this.hasPaid = data.hasPaid; // Actualizează starea `hasPaid`
+        this.hasPaid = data.hasPaid;
       } catch (error) {
         console.error("Error checking payment status:", error);
       }
-    }
+    },
   },
   mounted() {
     const script = document.createElement("script");
@@ -106,9 +110,8 @@ export default {
     script.type = "text/javascript";
     document.body.appendChild(script);
 
-    this.positions = this.agents.map(() => ({ x: 0, y: 0 }));
-    this.checkPaymentStatus(); // Verifică starea plății la încărcare
-  }
+    this.checkPaymentStatus(); // Verifică statusul plății la montarea aplicației.
+  },
 };
 </script>
 
