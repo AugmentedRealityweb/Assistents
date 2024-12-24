@@ -234,7 +234,7 @@ export default {
   color: white;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  max-width: 80%;
+  max-width: 180%;
   margin: 0 auto;
   font-size: 1.2rem;
 }
