@@ -259,7 +259,7 @@ export default {
   color: white;
   padding: 10px;
   border-radius: 10px;
-  max-width: 100%;
+  max-width: 700%;
   text-align: center;
   font-size: 1rem;
 }
