@@ -49,7 +49,7 @@ methods: {
   async handlePayment() {
     const stripe = await loadStripe("pk_live_51LhHVFJOzg3eyu5LJRnplRv2AKh0MGJEew4HhNbn3Eu2LfJkbZUv2j4lFNxulY5ugbb6wrh07QCaX0djdFnQ8f7A00tyuYKXEL"); // Înlocuiește cu cheia ta publică Stripe
   
-    const response = await fetch("https://assistents.vercel.app/api/create-checkout-session", {
+    const response = await fetch("/api/create-checkout-session", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
     });
