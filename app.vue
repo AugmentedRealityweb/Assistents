@@ -261,7 +261,7 @@ export default {
   border-radius: 10px;
   max-width: 700%;
   text-align: center;
-  font-size: 1rem;
+  font-size: 0.5rem;
 }
 
 @keyframes float {
