@@ -1,8 +1,13 @@
-app.post("/api/create-checkout-session", async (req, res) => {
-  try {
-    console.log("Cerere primită pentru creare sesiune");
-    console.log("Cheia secretă Stripe:", process.env.STRIPE_SECRET_KEY);
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
+module.exports = async (req, res) => {
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
+    res.status(405).json({ error: "Method Not Allowed" });
+    return;
+  }
+
+  try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
@@ -12,7 +17,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
             product_data: {
               name: "Access Fee",
             },
-            unit_amount: 100, // 1 RON
+            unit_amount: 100, // 1 RON în bani
           },
           quantity: 1,
         },
@@ -22,10 +27,9 @@ app.post("/api/create-checkout-session", async (req, res) => {
       cancel_url: `${req.headers.origin}/cancel`,
     });
 
-    console.log("Sesiune creată:", session.id);
-    res.json({ id: session.id });
+    res.status(200).json({ id: session.id });
   } catch (error) {
-    console.error("Eroare la crearea sesiunii:", error.message);
+    console.error("Eroare la crearea sesiunii: ", error.message);
     res.status(500).json({ error: error.message });
   }
-});
+};
