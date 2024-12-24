@@ -39,9 +39,9 @@ app.post("/api/create-checkout-session", async (req, res) => {
 });
 
 // Endpoint pentru verificarea stării plății
-app.get("/api/payment-status", (req, res) => {
-  const userId = req.query.userId; // Presupunem că userId este trimis în query string
-  const hasPaid = userPaymentStatus[userId] || false;
+app.get("/api/check-payment-status", (req, res) => {
+  // Exemplu: verifică baza de date sau o logică specifică
+  const hasPaid = true; // Modifică pentru a returna starea reală
   res.json({ hasPaid });
 });
 
