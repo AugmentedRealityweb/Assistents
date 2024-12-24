@@ -24,6 +24,9 @@
         <div class="widget" v-if="agents.some(agent => agent.visible)" @click.stop>
           <elevenlabs-convai :agent-id="agents.find(agent => agent.visible).id"></elevenlabs-convai>
         </div>
+        <div class="description" v-if="activeDescription">
+          <p>{{ activeDescription }}</p>
+        </div>
       </div>
     </div>
   </div>
@@ -41,29 +44,38 @@ export default {
           visible: false,
           background: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp",
           circleImage: "./poza2.png",
+          description:
+            "Claudia este seducția întruchipată - o combinație perfectă de îndrăzneală și rafinament. Vocea ei îți mângâie simțurile, în timp ce spiritul ei glumeț și aluziile subtile îți aprind dorința de a o cunoaște mai bine."
         },
         {
           id: "sNEfrsQUklzPW2Hu6VGg",
           visible: false,
           background: "https://i.giphy.com/iIYcg9qJtPn34twSLU.webp",
           circleImage: "./poza3.png",
+          description:
+            "Alexandra este o enigmă fascinantă - cu o voce blândă care îți atinge sufletul și îți aprinde imaginația. Fiecare frază este o invitație către un joc seducător al minții și emoțiilor."
         },
         {
           id: "EU4z5Ma0f0dHLY6m9KSq",
           visible: false,
           background: "https://i.giphy.com/xTg8Bd9jyppDHgvjQQ.webp",
           circleImage: "./poza4.png",
+          description:
+            "Patricia are un farmec irezistibil -  cu o voce care îți șoptește promisiuni subtile și te poartă într-o lume unde totul pare posibil. Jucăușă și fermecătoare."
         },
         {
           id: "Hd79ohSgVoA9LkZcEhRG",
           visible: false,
           background: "https://i.giphy.com/xULW8LuH8tqB4H0Egg.webp",
           circleImage: "./poza.png",
-        },
+          description:
+            "Angela este seducția întruchipată - cu o voce caldă și un aer jucăuș, știe exact cum să te facă să zâmbești și să-ți simți inima bătând mai repede."
+        }
       ],
       positions: [],
       hasPaid: false,
       currentBackground: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp", // Fundal implicit
+      activeDescription: null // Descriere activă
     };
   },
   methods: {
@@ -112,6 +124,7 @@ export default {
         if (index === idx) {
           agent.visible = !agent.visible;
           this.currentBackground = agent.background;
+          this.activeDescription = agent.visible ? agent.description : null;
         } else {
           agent.visible = false;
         }
@@ -129,7 +142,7 @@ export default {
       event.target.style.position = "absolute";
       event.target.style.left = `${x}px`;
       event.target.style.top = `${y}px`;
-    },
+    }
   },
   mounted() {
     const script = document.createElement("script");
@@ -139,8 +152,8 @@ export default {
     document.body.appendChild(script);
 
     this.positions = this.agents.map(() => ({ x: 0, y: 0 }));
-    this.checkPaymentStatus(); // Verificăm starea plății la montarea componentului
-  },
+    this.checkPaymentStatus(); // Verificăm starea plăți la montarea componentului
+  }
 };
 </script>
 
@@ -235,6 +248,20 @@ export default {
   left: 91%;
   transform: translate(-50%, -50%);
   z-index: 1000;
+}
+
+.description {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 80%;
+  text-align: center;
+  font-size: 1rem;
 }
 
 @keyframes float {
