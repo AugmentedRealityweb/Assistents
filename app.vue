@@ -39,7 +39,7 @@ export default {
         {
           id: "5mz0QGMTS6vciobpmiXO",
           visible: false,
-          background: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp",
+          background: "https://i.giphy.com/TyijeM6uaGY00.webp",
           circleImage: "./poza2.png",
         },
         {
@@ -63,7 +63,7 @@ export default {
       ],
       positions: [],
       hasPaid: false,
-      currentBackground: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp", // Fundal implicit
+      currentBackground: "https://i.giphy.com/TyijeM6uaGY00.webp", // Fundal implicit
     };
   },
   methods: {
@@ -208,8 +208,8 @@ export default {
 }
 
 .circle {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   border: 2px solid white;
   border-radius: 50%;
   cursor: pointer;
@@ -231,7 +231,7 @@ export default {
 
 .widget {
   position: absolute;
-  bottom: -20px;
+  bottom: -120px;
   left: 400%;
   transform: translateX(-50%);
 }
