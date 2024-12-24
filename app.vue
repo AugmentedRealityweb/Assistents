@@ -230,12 +230,16 @@ export default {
   color: white;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  max-width: 90%;
+  width: 80%; /* Adjust width for horizontal alignment */
+  max-width: 900px; /* Add a maximum width for larger screens */
   margin: 0 auto;
   font-size: 1.2rem;
   position: fixed;
-  bottom: 10%;
+  bottom: 5%; /* Ensure it stays at the bottom */
   left: 50%;
   transform: translateX(-50%);
+  text-align: center; /* Ensure text is centrally aligned */
+  white-space: normal; /* Ensure proper line breaking */
+  line-height: 1.5; /* Improve readability */
 }
 </style>
