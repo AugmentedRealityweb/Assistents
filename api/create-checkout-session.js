@@ -1,19 +1,13 @@
-import express from "express";
-import Stripe from "stripe";
-import cors from "cors";
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); // Cheia secretă Stripe
+module.exports = async (req, res) => {
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
+    res.status(405).json({ error: "Method Not Allowed" });
+    return;
+  }
 
-const app = express();
-
-// Middleware
-app.use(express.json());
-app.use(cors());
-
-// Endpoint pentru creare sesiuni Stripe Checkout
-app.post("/api/create-checkout-session", async (req, res) => {
   try {
-    console.log("Cerere primită pentru creare sesiune");
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
@@ -33,12 +27,9 @@ app.post("/api/create-checkout-session", async (req, res) => {
       cancel_url: `${req.headers.origin}/cancel`,
     });
 
-    console.log("Sesiune creată: ", session.id);
-    res.json({ id: session.id });
+    res.status(200).json({ id: session.id });
   } catch (error) {
     console.error("Eroare la crearea sesiunii: ", error.message);
     res.status(500).json({ error: error.message });
   }
-});
-
-export default app;
+};
