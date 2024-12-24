@@ -14,18 +14,15 @@
           v-for="(agent, index) in agents"
           :key="index"
           class="circle"
+          draggable="true"
+          @dragstart="dragStart($event, index)"
+          @dragend="dragEnd($event, index)"
           @click="toggleWidget(index)"
         >
           <img :src="agent.circleImage" alt="Agent Circle" class="circle-image" />
         </div>
-      </div>
-
-      <div class="widget-container" v-if="agents.some(agent => agent.visible)">
-        <div class="widget">
+        <div class="widget" v-if="agents.some(agent => agent.visible)" @click.stop>
           <elevenlabs-convai :agent-id="agents.find(agent => agent.visible).id"></elevenlabs-convai>
-        </div>
-        <div class="description">
-          {{ agents.find(agent => agent.visible).description }}
         </div>
       </div>
     </div>
@@ -44,30 +41,27 @@ export default {
           visible: false,
           background: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp",
           circleImage: "./poza2.png",
-          description: "Claudia este senzualitatea întruchipată – o combinație perfectă de îndrăzneală și rafinament. Vocea ei îți mângâie simțurile, în timp ce spiritul ei glumeț îți aprinde dorința de a o cunoaște mai bine."
         },
         {
           id: "sNEfrsQUklzPW2Hu6VGg",
           visible: false,
           background: "https://i.giphy.com/iIYcg9qJtPn34twSLU.webp",
           circleImage: "./poza3.png",
-          description: "Alexandra este o enigmă fascinantă - cu o voce catifelată care îți atinge sufletul și îți aprinde imaginația."
         },
         {
           id: "EU4z5Ma0f0dHLY6m9KSq",
           visible: false,
           background: "https://i.giphy.com/xTg8Bd9jyppDHgvjQQ.webp",
           circleImage: "./poza4.png",
-          description: "Patricia are un farmec irezistibil - Jucăușă și fermecătoare, își folosește inteligența și căldura pentru a te captiva complet."
         },
         {
           id: "Hd79ohSgVoA9LkZcEhRG",
           visible: false,
           background: "https://i.giphy.com/xULW8LuH8tqB4H0Egg.webp",
           circleImage: "./poza.png",
-          description: "Angela este seducția întruchipată – cu o voce caldă și un aer jucăuș, știe exact cum să te facă să zâmbești și să-ți simți inima bătând mai repede."
-        }
+        },
       ],
+      positions: [],
       hasPaid: false,
       currentBackground: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp", // Fundal implicit
     };
@@ -85,7 +79,7 @@ export default {
         });
 
         const { id } = await response.json();
-        localStorage.setItem("sessionId", id);
+        localStorage.setItem("sessionId", id); // Salvăm `sessionId` în localStorage
         await stripe.redirectToCheckout({ sessionId: id });
       } catch (error) {
         console.error("Error during payment:", error.message);
@@ -104,19 +98,38 @@ export default {
         );
         const data = await response.json();
 
-        this.hasPaid = data.hasPaid;
+        if (data.hasPaid) {
+          this.hasPaid = true;
+        } else {
+          this.hasPaid = false;
+        }
       } catch (error) {
         console.error("Error checking payment status:", error.message);
       }
     },
     toggleWidget(index) {
       this.agents.forEach((agent, idx) => {
-        agent.visible = idx === index ? !agent.visible : false;
-        if (agent.visible) {
+        if (index === idx) {
+          agent.visible = !agent.visible;
           this.currentBackground = agent.background;
+        } else {
+          agent.visible = false;
         }
       });
-    }
+    },
+    dragStart(event, index) {
+      event.dataTransfer.setData("index", index);
+    },
+    dragEnd(event, index) {
+      const container = event.target.parentNode;
+      const rect = container.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      this.positions[index] = { x, y };
+      event.target.style.position = "absolute";
+      event.target.style.left = `${x}px`;
+      event.target.style.top = `${y}px`;
+    },
   },
   mounted() {
     const script = document.createElement("script");
@@ -125,8 +138,9 @@ export default {
     script.type = "text/javascript";
     document.body.appendChild(script);
 
-    this.checkPaymentStatus();
-  }
+    this.positions = this.agents.map(() => ({ x: 0, y: 0 }));
+    this.checkPaymentStatus(); // Verificăm starea plății la montarea componentului
+  },
 };
 </script>
 
@@ -141,6 +155,9 @@ export default {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  border: 5px solid black;
+  box-sizing: border-box;
+  overflow: hidden;
   position: relative;
   color: white;
   text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
@@ -197,6 +214,7 @@ export default {
   border-radius: 50%;
   cursor: pointer;
   background-color: rgba(255, 255, 255, 0.8);
+  animation: float 7s ease-in-out infinite;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -211,35 +229,23 @@ export default {
   object-fit: cover;
 }
 
-.widget-container {
+.widget {
   position: fixed;
-  top: 50%;
-  left: 50%;
+  top: 46%;
+  left: 91%;
   transform: translate(-50%, -50%);
   z-index: 1000;
-  text-align: center;
 }
 
-.widget {
-  margin-bottom: 20px;
-}
-
-.description {
-  padding: 10px;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  width: 80%; /* Ensures the width spans a good horizontal space */
-  max-width: 900px; /* Restricts the width for readability */
-  margin: 0 auto;
-  font-size: 1.2rem;
-  position: fixed;
-  bottom: 5%; /* Positions the description box at the bottom */
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center; /* Centers the text inside the box */
-  white-space: normal; /* Allows the text to wrap */
-  line-height: 1.5; /* Improves line spacing for readability */
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 </style>
