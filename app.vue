@@ -208,8 +208,8 @@ export default {
 }
 
 .circle {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border: 2px solid white;
   border-radius: 50%;
   cursor: pointer;
@@ -232,7 +232,7 @@ export default {
 .widget {
   position: fixed;
   top: 50%;
-  left: 50%;
+  left: -50%;
   transform: translate(-50%, -50%);
   z-index: 1000;
 }
