@@ -35,7 +35,7 @@ export default {
   data() {
     return {
       backgroundImage:
-        "https://images.unsplash.com/photo-1498050108023-c5249f4df085?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDV8fHRlY2hub2xvZ3l8ZW58MHx8fHwxNjg4MjkwNzI4&ixlib=rb-4.0.3&q=80&w=1920",
+        "https://www.instagram.com/reel/DDy6dH4homq/",
       agents: [
         { id: "5mz0QGMTS6vciobpmiXO", visible: false },
         { id: "sNEfrsQUklzPW2Hu6VGg", visible: false },
