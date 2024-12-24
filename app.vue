@@ -18,9 +18,14 @@
         >
           <img :src="agent.circleImage" alt="Agent Circle" class="circle-image" />
         </div>
-        <div class="widget" v-if="agents.some(agent => agent.visible)">
+      </div>
+
+      <div class="widget-container" v-if="agents.some(agent => agent.visible)">
+        <div class="widget">
           <elevenlabs-convai :agent-id="agents.find(agent => agent.visible).id"></elevenlabs-convai>
-          <p class="description">{{ agents.find(agent => agent.visible).description }}</p>
+        </div>
+        <div class="description">
+          {{ agents.find(agent => agent.visible).description }}
         </div>
       </div>
     </div>
@@ -39,7 +44,7 @@ export default {
           visible: false,
           background: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp",
           circleImage: "./poza2.png",
-          description: "Claudia este senzualitatea întruchipată– o combinație perfectă de îndrăzneală și rafinament. Vocea ei îți mângâie simțurile, în timp ce spiritul ei glumeț îți aprind dorința de a o cunoaște mai bine."
+          description: "Claudia este senzualitatea întruchipată – o combinație perfectă de îndrăzneală și rafinament. Vocea ei îți mângâie simțurile, în timp ce spiritul ei glumeț îți aprinde dorința de a o cunoaște mai bine."
         },
         {
           id: "sNEfrsQUklzPW2Hu6VGg",
@@ -64,7 +69,7 @@ export default {
         }
       ],
       hasPaid: false,
-      currentBackground: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp"
+      currentBackground: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp" // Fundal implicit
     };
   },
   methods: {
@@ -99,22 +104,16 @@ export default {
         );
         const data = await response.json();
 
-        if (data.hasPaid) {
-          this.hasPaid = true;
-        } else {
-          this.hasPaid = false;
-        }
+        this.hasPaid = data.hasPaid;
       } catch (error) {
         console.error("Error checking payment status:", error.message);
       }
     },
     toggleWidget(index) {
       this.agents.forEach((agent, idx) => {
-        if (index === idx) {
-          agent.visible = !agent.visible;
+        agent.visible = idx === index ? !agent.visible : false;
+        if (agent.visible) {
           this.currentBackground = agent.background;
-        } else {
-          agent.visible = false;
         }
       });
     }
@@ -142,9 +141,6 @@ export default {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  border: 5px solid black;
-  box-sizing: border-box;
-  overflow: hidden;
   position: relative;
   color: white;
   text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
@@ -205,6 +201,7 @@ export default {
   justify-content: center;
   align-items: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
 }
 
 .circle-image {
@@ -214,18 +211,27 @@ export default {
   object-fit: cover;
 }
 
-.widget {
+.widget-container {
   position: fixed;
-  top: 46%;
-  left: 91%;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1000;
   text-align: center;
 }
 
+.widget {
+  margin-bottom: 20px;
+}
+
 .description {
-  margin-top: 20px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.8);
   color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  max-width: 80%;
+  margin: 0 auto;
   font-size: 1.2rem;
 }
 </style>
