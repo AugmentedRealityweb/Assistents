@@ -221,7 +221,11 @@ export default {
 }
 
 .widget {
-  margin-bottom: 20px;
+  position: fixed;
+  top: 46%;
+  left: 91%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
 }
 
 .description {
