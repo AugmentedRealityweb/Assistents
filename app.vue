@@ -252,16 +252,19 @@ export default {
 
 .description {
   position: fixed;
-  bottom: 60px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.8);
   color: white;
-  padding: 10px;
-  border-radius: 10px;
-  max-width: 700%;
-  text-align: center;
-  font-size: 0.5rem;
+  padding: 5px 15px;
+  border-radius: 8px;
+  max-width: 70%;
+  text-align: justify;
+  font-size: 1.2rem;
+  line-height: 1.4;
+  white-space: normal;
+  word-wrap: break-word;
 }
 
 @keyframes float {
