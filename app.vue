@@ -252,7 +252,7 @@ export default {
 
 .description {
   position: fixed;
-  bottom: 70px;
+  bottom: -70px;
   left: 50%;
   transform: scale(2.5);
   background: rgba(0, 0, 0, 0.8);
