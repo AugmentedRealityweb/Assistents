@@ -1,6 +1,5 @@
 const express = require("express");
-const stripe = require("stripe")("const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-"); // Înlocuiește cu cheia ta secretă Stripe
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Folosește cheia secretă Stripe din variabilele de mediu
 const cors = require("cors");
 
 const app = express();
@@ -10,8 +9,9 @@ app.use(express.json());
 app.use(cors());
 
 // Endpoint pentru creare sesiuni Stripe Checkout
-app.post("/create-checkout-session", async (req, res) => {
+app.post("/api/create-checkout-session", async (req, res) => {
   try {
+    console.log("Cerere primită pentru creare sesiune");
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
@@ -31,11 +31,14 @@ app.post("/create-checkout-session", async (req, res) => {
       cancel_url: `${req.headers.origin}/cancel`,
     });
 
+    console.log("Sesiune creată: ", session.id);
     res.json({ id: session.id });
   } catch (error) {
+    console.error("Eroare la crearea sesiunii: ", error.message);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Rulează serverul pe portul 4242
-app.listen(4242, () => console.log("Server running on http://localhost:4242"));
+// Rulează serverul pe portul 4242 sau un port specificat în variabilele de mediu
+const PORT = process.env.PORT || 4242;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
