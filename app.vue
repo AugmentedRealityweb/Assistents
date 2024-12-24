@@ -200,11 +200,11 @@ export default {
 
 .circle-container {
   position: absolute;
-  top: 40px;
+  bottom: 60px;
   width: 100%;
   display: flex;
   justify-content: center;
-  gap: 35px;
+  gap: 15px;
 }
 
 .circle {
