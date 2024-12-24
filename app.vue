@@ -69,7 +69,7 @@ export default {
         }
       ],
       hasPaid: false,
-      currentBackground: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp" // Fundal implicit
+      currentBackground: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp", // Fundal implicit
     };
   },
   methods: {
@@ -81,7 +81,7 @@ export default {
       try {
         const response = await fetch("/api/create-checkout-session", {
           method: "POST",
-          headers: { "Content-Type": "application/json" }
+          headers: { "Content-Type": "application/json" },
         });
 
         const { id } = await response.json();
@@ -221,11 +221,7 @@ export default {
 }
 
 .widget {
-  position: fixed;
-  top: 46%;
-  left: 91%;
-  transform: translate(-50%, -50%);
-  z-index: 1000;
+  margin-bottom: 20px;
 }
 
 .description {
@@ -234,12 +230,12 @@ export default {
   color: white;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  max-width: 500%;
+  max-width: 90%;
   margin: 0 auto;
   font-size: 1.2rem;
   position: fixed;
-  transform: translate(-50%, -50%);
-  top: 50%; /* Sau valoarea dorită */
-  left: 50%; /* Sau valoarea dorită */
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
 }
 </style>
