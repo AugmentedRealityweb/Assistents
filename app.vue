@@ -1,9 +1,12 @@
 <template>
   <div id="app">
-    <div class="container" :style="{ backgroundImage: `url(${currentBackground})` }">
+    <div
+      class="container"
+      :style="{ backgroundImage: `url(${backgroundImage})` }"
+    >
       <div class="header">
         <h1>Virtual Assistant Hub</h1>
-        <p>Select an assistant by clicking on a circle below.</p>
+        <p>Select an assistant by clicking on the circle below.</p>
       </div>
       <div class="paywall" v-if="!hasPaid">
         <p>Unlock full access for just 2 RON!</p>
@@ -11,15 +14,14 @@
       </div>
       <div class="circle-container" v-else>
         <div
-          v-for="(agent, index) in agents"
-          :key="index"
           class="circle"
           draggable="true"
-          @dragstart="dragStart($event, index)"
-          @dragend="dragEnd($event, index)"
-          @click="toggleWidget(index)"
+          @dragstart="dragStart($event)"
+          @dragend="dragEnd($event)"
+          @click="toggleWidget"
         >
-          <div class="widget" v-if="agent.visible" @click.stop>
+          <img src="/poza" alt="Assistant Icon" class="circle-image" />
+          <div class="widget" v-if="agentVisible" @click.stop>
             <elevenlabs-convai :agent-id="agent.id"></elevenlabs-convai>
           </div>
         </div>
@@ -34,31 +36,10 @@ import { loadStripe } from "@stripe/stripe-js";
 export default {
   data() {
     return {
-      agents: [
-        {
-          id: "5mz0QGMTS6vciobpmiXO",
-          visible: false,
-          background: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp",
-        },
-        {
-          id: "sNEfrsQUklzPW2Hu6VGg",
-          visible: false,
-          background: "https://i.giphy.com/iIYcg9qJtPn34twSLU.webp",
-        },
-        {
-          id: "EU4z5Ma0f0dHLY6m9KSq",
-          visible: false,
-          background: "https://i.giphy.com/xTg8Bd9jyppDHgvjQQ.webp",
-        },
-        {
-          id: "Hd79ohSgVoA9LkZcEhRG",
-          visible: false,
-          background: "https://i.giphy.com/xULW8LuH8tqB4H0Egg.webp",
-        },
-      ],
-      positions: [],
+      backgroundImage: "https://i.giphy.com/xULW8LuH8tqB4H0Egg.webp", // Fundalul asociat cu agentul
+      agent: { id: "Hd79ohSgVoA9LkZcEhRG" },
+      agentVisible: false,
       hasPaid: false,
-      currentBackground: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp", // Fundal implicit
     };
   },
   methods: {
@@ -74,7 +55,7 @@ export default {
         });
 
         const { id } = await response.json();
-        localStorage.setItem("sessionId", id); // Salvăm `sessionId` în localStorage
+        localStorage.setItem("sessionId", id);
         await stripe.redirectToCheckout({ sessionId: id });
       } catch (error) {
         console.error("Error during payment:", error.message);
@@ -102,25 +83,17 @@ export default {
         console.error("Error checking payment status:", error.message);
       }
     },
-    toggleWidget(index) {
-      this.agents.forEach((agent, idx) => {
-        if (index === idx) {
-          agent.visible = !agent.visible;
-          this.currentBackground = agent.background;
-        } else {
-          agent.visible = false;
-        }
-      });
+    toggleWidget() {
+      this.agentVisible = !this.agentVisible;
     },
-    dragStart(event, index) {
-      event.dataTransfer.setData("index", index);
+    dragStart(event) {
+      event.dataTransfer.setData("agent", JSON.stringify(this.agent));
     },
-    dragEnd(event, index) {
+    dragEnd(event) {
       const container = event.target.parentNode;
       const rect = container.getBoundingClientRect();
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
-      this.positions[index] = { x, y };
       event.target.style.position = "absolute";
       event.target.style.left = `${x}px`;
       event.target.style.top = `${y}px`;
@@ -133,8 +106,7 @@ export default {
     script.type = "text/javascript";
     document.body.appendChild(script);
 
-    this.positions = this.agents.map(() => ({ x: 0, y: 0 }));
-    this.checkPaymentStatus(); // Verificăm starea plății la montarea componentului
+    this.checkPaymentStatus();
   },
 };
 </script>
@@ -203,8 +175,8 @@ export default {
 }
 
 .circle {
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   border: 2px solid white;
   border-radius: 50%;
   cursor: pointer;
@@ -215,6 +187,12 @@ export default {
   align-items: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   position: relative;
+}
+
+.circle-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
 }
 
 .widget {
