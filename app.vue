@@ -103,13 +103,34 @@ export default {
         const { id } = await response.json();
         localStorage.setItem("sessionId", id);
         await stripe.redirectToCheckout({ sessionId: id });
-
-        // Salvează timestamp-ul plății în localStorage
-        const paymentTimestamp = new Date().getTime();
-        localStorage.setItem("paymentTimestamp", paymentTimestamp);
-        this.hasPaid = true;
       } catch (error) {
         console.error("Error during payment:", error.message);
+      }
+    },
+    async checkPaymentStatus() {
+      try {
+        const sessionId = localStorage.getItem("sessionId");
+        if (!sessionId) {
+          console.error("Session ID is missing.");
+          return;
+        }
+
+        const response = await fetch(
+          /api/check-payment-status?sessionId=${sessionId}
+        );
+        const data = await response.json();
+
+        if (data.hasPaid) {
+          this.hasPaid = true;
+
+          // Salvează timestamp-ul de plată
+          const paymentTimestamp = new Date().getTime();
+          localStorage.setItem("paymentTimestamp", paymentTimestamp);
+        } else {
+          this.hasPaid = false;
+        }
+      } catch (error) {
+        console.error("Error checking payment status:", error.message);
       }
     },
     checkPaymentStatusOnLoad() {
@@ -125,28 +146,9 @@ export default {
         } else {
           this.hasPaid = true;
         }
-      }
-    },
-    async checkPaymentStatus() {
-      try {
-        const sessionId = localStorage.getItem("sessionId");
-        if (!sessionId) {
-          console.error("Session ID is missing.");
-          return;
-        }
-
-        const response = await fetch(
-          `/api/check-payment-status?sessionId=${sessionId}`
-        );
-        const data = await response.json();
-
-        if (data.hasPaid) {
-          this.hasPaid = true;
-        } else {
-          this.hasPaid = false;
-        }
-      } catch (error) {
-        console.error("Error checking payment status:", error.message);
+      } else {
+        // Dacă nu există timestamp, verificăm starea plății
+        this.checkPaymentStatus();
       }
     }
   },
@@ -158,7 +160,6 @@ export default {
     document.body.appendChild(script);
 
     this.checkPaymentStatusOnLoad();
-
     if (localStorage.getItem("timerExpired")) {
       this.timerExpired = true;
     }
