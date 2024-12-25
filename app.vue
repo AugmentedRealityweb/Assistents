@@ -96,6 +96,7 @@ export default {
         });
 
         const { id } = await response.json();
+        if (!id) throw new Error("Session ID not received.");
         localStorage.setItem("sessionId", id);
         await stripe.redirectToCheckout({ sessionId: id });
       } catch (error) {
@@ -107,12 +108,11 @@ export default {
         const sessionId = localStorage.getItem("sessionId");
         if (!sessionId) {
           console.error("Session ID is missing.");
+          this.hasPaid = false;
           return;
         }
 
-        const response = await fetch(
-          `/api/check-payment-status?sessionId=${sessionId}`
-        );
+        const response = await fetch(`/api/check-payment-status?sessionId=${sessionId}`);
         const data = await response.json();
 
         if (data.hasPaid) {
@@ -121,9 +121,12 @@ export default {
           localStorage.setItem("paymentTimestamp", paymentTimestamp);
         } else {
           this.hasPaid = false;
+          localStorage.removeItem("sessionId");
         }
       } catch (error) {
         console.error("Error checking payment status:", error.message);
+        this.hasPaid = false;
+        localStorage.removeItem("sessionId");
       }
     },
     validatePaymentTime() {
@@ -133,7 +136,6 @@ export default {
         const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
 
         if (elapsedSeconds >= 30) {
-          // Reset paywall after 30 seconds
           this.hasPaid = false;
           localStorage.removeItem("paymentTimestamp");
         } else {
@@ -148,9 +150,12 @@ export default {
       this.startPaywallTimer();
     },
     startPaywallTimer() {
-      setInterval(() => {
+      if (this.timerId) {
+        clearInterval(this.timerId);
+      }
+      this.timerId = setInterval(() => {
         this.validatePaymentTime();
-      }, 1000); // Check every second to update the paywall state
+      }, 1000);
     }
   },
   mounted() {
@@ -160,10 +165,10 @@ export default {
     script.type = "text/javascript";
     document.body.appendChild(script);
 
-    this.validatePaywallOnLoad();
-    this.checkPaymentStatus();
+    Promise.all([this.checkPaymentStatus(), this.validatePaywallOnLoad()])
+      .then(() => console.log("Initialization complete."))
+      .catch(error => console.error("Error during initialization:", error));
   }
-}
 };
 </script>
 
