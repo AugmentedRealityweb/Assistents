@@ -137,12 +137,12 @@ export default {
         } else {
           this.hasPaid = true;
         }
+      } else {
+        this.hasPaid = false;
       }
     },
-    validatePaywallInterval() {
-      setInterval(() => {
-        this.validatePaymentTime();
-      }, 30000); // Re-check every 30 seconds
+    validatePaywallOnLoad() {
+      this.validatePaymentTime();
     }
   },
   mounted() {
@@ -152,9 +152,8 @@ export default {
     script.type = "text/javascript";
     document.body.appendChild(script);
 
-    this.validatePaymentTime();
+    this.validatePaywallOnLoad();
     this.checkPaymentStatus();
-    this.validatePaywallInterval();
   }
 };
 </script>
