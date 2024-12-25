@@ -261,7 +261,7 @@ export default {
   margin: 0 auto;
   font-size: 1.2rem;
   position: fixed;
-  bottom: 5%; /* Positions the description box at the bottom */
+  bottom: 10%; /* Positions the description box at the bottom */
   left: 50%;
   transform: translateX(-50%);
   text-align: center; /* Centers the text inside the box */
