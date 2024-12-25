@@ -158,9 +158,9 @@ export default {
         const currentTime = new Date().getTime();
         const elapsedSeconds = (currentTime - freeAccessTimestamp) / 1000;
 
-        this.freeAccessTimeLeft = Math.max(180 - Math.floor(elapsedSeconds), 0);
+        this.freeAccessTimeLeft = Math.max(200 - Math.floor(elapsedSeconds), 0);
 
-        if (elapsedSeconds >= 180) {
+        if (elapsedSeconds >= 200) {
           this.hasPaid = false;
           localStorage.setItem("hasPaid", "false");
         } else {
@@ -178,7 +178,7 @@ export default {
         const currentTime = new Date().getTime();
         const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
 
-        if (elapsedSeconds >= 180) {
+        if (elapsedSeconds >= 200) {
           this.hasPaid = false;
           localStorage.setItem("hasPaid", "false");
           localStorage.removeItem("paymentTimestamp");
@@ -251,7 +251,7 @@ export default {
   position: absolute;
   width: 10px;
   height: 10px;
-  background: radial-gradient(circle, rgba(245, 39, 145, 0.15) 0%, rgba(245, 39, 145, 0.10) 70%);
+  background: radial-gradient(circle, rgba(245, 39, 145, 0.15) 0%, rgba(245, 39, 145, 0) 70%);
   border-radius: 50%;
   animation: sparkleAnimation 3s infinite ease-in-out;
   opacity: 0; /* Începem cu punctul ascuns */
@@ -292,25 +292,25 @@ export default {
   .header h1 .sparkle:nth-child(2) {
   top: 65%;
   left: 20%;
-  animation-delay: 2s;
+  animation-delay: 1.4s;
 }
 
   header h1 .sparkle:nth-child(2) {
   top: 25%;
   left: 50%;
-  animation-delay: 2s;
+  animation-delay: 1s;
 }
 
   header h1 .sparkle:nth-child(2) {
   top: 38%;
   left: 10%;
-  animation-delay: 2s;
+  animation-delay: 0.2s;
 }
 
   header h1 .sparkle:nth-child(2) {
   top: 52%;
   left: 60%;
-  animation-delay: 2s;
+  animation-delay: 1.3s;
 }
 /* Animația pentru aprinderea și stingerea licuricilor */
 @keyframes sparkleAnimation {
