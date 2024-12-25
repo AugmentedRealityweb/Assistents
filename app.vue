@@ -253,7 +253,7 @@ export default {
 .description {
   all: unset; /* Elimină toate stilurile implicite */
   position: fixed; /* Reaplică stilurile tale */
-  bottom: -10px;
+  bottom: -20px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.8);
@@ -263,7 +263,7 @@ export default {
   font-size: 1rem !important;
   line-height: 1.5;
   text-align: justify;
-  max-width: 80%;
+  max-width: 90%;
   white-space: normal;
   word-wrap: break-word;
 }
