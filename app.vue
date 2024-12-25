@@ -45,7 +45,7 @@ export default {
           background: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp",
           circleImage: "./poza2.png",
           description:
-            "Claudia este seducția întruchipată - o combinație perfectă de îndrăzneală și rafinament. Vocea ei îți mângâie simțurile, în timp ce spiritul ei glumeț și aluziile subtile îți aprind dorința de a o cunoaște mai bine."
+            "Claudia este seducția întruchipată - o combinație perfectă de îndrăzneală și rafinament. Vocea ei îți mângâie simțurile, în timp ce spiritul ei glumeț îți aprinde dorința de a o cunoaște mai bine."
         },
         {
           id: "sNEfrsQUklzPW2Hu6VGg",
@@ -244,7 +244,7 @@ export default {
 
 .widget {
   position: fixed;
-  top: 46%;
+  top: 45%;
   left: 91%;
   transform: translate(-50%, -50%);
   z-index: 1000;
