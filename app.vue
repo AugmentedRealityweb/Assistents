@@ -151,6 +151,8 @@ export default {
 };
 </script>
 
+</script>
+
 <style scoped>
 .container {
   display: flex;
@@ -162,6 +164,9 @@ export default {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  border: 5px solid black;
+  box-sizing: border-box;
+  overflow: hidden;
   position: relative;
   color: white;
   text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
@@ -224,6 +229,7 @@ export default {
   border-radius: 50%;
   cursor: pointer;
   background-color: rgba(255, 255, 255, 0.8);
+  animation: float 7s ease-in-out infinite;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -236,15 +242,6 @@ export default {
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
-}
-
-.widget-container {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1000;
-  text-align: center;
 }
 
 .widget {
@@ -272,5 +269,17 @@ export default {
   text-align: center; /* Centers the text inside the box */
   white-space: normal; /* Allows the text to wrap */
   line-height: 1.5; /* Improves line spacing for readability */
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 </style>
