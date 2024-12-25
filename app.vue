@@ -234,37 +234,62 @@ export default {
   margin: 0;
   color: rgba(247, 0, 44, 0.8);
   position: relative;
-  overflow: hidden; /* Ascunde luminile care ies din element */
+  overflow: visible; /* Permitem punctelor să iasă în afara textului */
 }
 
-.header h1::before,
-.header h1::after {
-  content: "";
+.header h1 .sparkle {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, rgba(245, 39, 145, 0.10) 0%, rgba(245, 39, 145, 0.15) 60%);
-  opacity: 0;
-  animation: sparkle 3s infinite ease-in-out;
-  pointer-events: none; /* Luminile nu vor interfera cu textul */
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+  border-radius: 50%;
+  animation: sparkleAnimation 3s infinite ease-in-out;
+  opacity: 0; /* Începem cu punctul ascuns */
+  pointer-events: none;
 }
 
-.header h1::after {
-  animation-delay: 1.5s; /* Pentru a alterna luminile */
+/* Poziționarea punctelor aleatorii */
+.header h1 .sparkle:nth-child(1) {
+  top: 10%;
+  left: 20%;
+  animation-delay: 0.2s;
 }
 
-@keyframes sparkle {
+.header h1 .sparkle:nth-child(2) {
+  top: 30%;
+  left: 60%;
+  animation-delay: 1s;
+}
+
+.header h1 .sparkle:nth-child(3) {
+  top: 50%;
+  left: 40%;
+  animation-delay: 1.5s;
+}
+
+.header h1 .sparkle:nth-child(4) {
+  top: 70%;
+  left: 80%;
+  animation-delay: 2s;
+}
+
+.header h1 .sparkle:nth-child(5) {
+  top: 85%;
+  left: 10%;
+  animation-delay: 2.5s;
+}
+
+/* Animația pentru aprinderea și stingerea licuricilor */
+@keyframes sparkleAnimation {
   0%, 100% {
     opacity: 0;
-    transform: translate(-100%, -100%) scale(0.5);
+    transform: scale(0.5);
   }
   50% {
     opacity: 1;
-    transform: translate(100%, 100%) scale(1.2);
+    transform: scale(1.2);
   }
-} /* Aici era problema: animația trebuie închisă! */
+}/* Aici era problema: animația trebuie închisă! */
 
 .header p {
   font-size: 1.2rem;
