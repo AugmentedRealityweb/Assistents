@@ -71,7 +71,7 @@ export default {
       ],
       hasPaid: false,
       currentBackground: "https://i.giphy.com/fygfeYhDOPrhTOHZ7v.webp",
-      activeDescription: null,
+      activeDescription: null
     };
   },
   methods: {
@@ -88,34 +88,20 @@ export default {
 
         const { id } = await response.json();
         localStorage.setItem("sessionId", id);
+        localStorage.setItem("paymentTimestamp", new Date().getTime());
         await stripe.redirectToCheckout({ sessionId: id });
       } catch (error) {
         console.error("Error during payment:", error.message);
       }
     },
-    async checkPaymentStatus() {
-      try {
-        const sessionId = localStorage.getItem("sessionId");
-        if (!sessionId) {
-          console.error("Session ID is missing.");
-          return;
+    toggleWidget(index) {
+      this.agents.forEach((agent, idx) => {
+        agent.visible = idx === index ? !agent.visible : false;
+        if (agent.visible) {
+          this.currentBackground = agent.background;
+          this.activeDescription = agent.description;
         }
-
-        const response = await fetch(
-          `/api/check-payment-status?sessionId=${sessionId}`
-        );
-        const data = await response.json();
-
-        if (data.hasPaid) {
-          this.hasPaid = true;
-          const paymentTimestamp = new Date().getTime();
-          localStorage.setItem("paymentTimestamp", paymentTimestamp);
-        } else {
-          this.hasPaid = false;
-        }
-      } catch (error) {
-        console.error("Error checking payment status:", error.message);
-      }
+      });
     },
     validatePaymentTime() {
       const paymentTimestamp = localStorage.getItem("paymentTimestamp");
@@ -128,130 +114,26 @@ export default {
         } else {
           this.hasPaid = true;
         }
+      } else {
+        this.hasPaid = false;
+      }
+    },
+    async checkPaymentStatus() {
+      try {
+        const sessionId = localStorage.getItem("sessionId");
+        if (!sessionId) return;
+
+        const response = await fetch(`/api/check-payment-status?sessionId=${sessionId}`);
+        const data = await response.json();
+        this.hasPaid = data.hasPaid;
+      } catch (error) {
+        console.error("Error checking payment status:", error.message);
       }
     }
   },
   mounted() {
-    const script = document.createElement("script");
-    script.src = "https://elevenlabs.io/convai-widget/index.js";
-    script.async = true;
-    script.type = "text/javascript";
-    document.body.appendChild(script);
-
     this.validatePaymentTime();
     this.checkPaymentStatus();
   }
 };
 </script>
-
-<style scoped>
-.container {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  width: 100vw;
-  height: 100vh;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  margin: 0;
-  padding: 0;
-  position: relative;
-  color: white;
-  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
-}
-
-.header {
-  margin-top: 20px;
-  text-align: center;
-}
-
-.header h1 {
-  font-size: 2.5rem;
-  margin: 0;
-  color: rgba(247, 0, 44, 0.8);
-}
-
-.header p {
-  font-size: 1.2rem;
-  margin: 10px 0;
-}
-
-.paywall {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 20px;
-  border-radius: 10px;
-}
-
-.paywall button {
-  background: #28a745;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.circle-container {
-  position: absolute;
-  top: 20%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
-
-.circle {
-  width: 50px;
-  height: 50px;
-  border: 2px solid white;
-  border-radius: 50%;
-  cursor: pointer;
-  background-color: rgba(255, 255, 255, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  position: relative;
-}
-
-.circle-image {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.widget {
-  position: fixed;
-  top: 50%;
-  left: 91%;
-  transform: translate(-50%, -50%);
-  z-index: 1000;
-}
-
-.description {
-  padding: 10px;
-  background: rgba(224, 200, 205, 0.57);
-  color: white;
-  border-radius: 25px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  width: 80%;
-  max-width: 900px;
-  margin: 0 auto;
-  font-size: 1.2rem;
-  position: fixed;
-  bottom: 20%;
-  left: 52%;
-  transform: translateX(-50%);
-  text-align: center;
-  white-space: normal;
-  line-height: 1.5;
-}
-</style>
