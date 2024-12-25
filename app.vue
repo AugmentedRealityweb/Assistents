@@ -136,27 +136,34 @@ export default {
         const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
 
         if (elapsedSeconds >= 30) {
-          // Reset paywall after 30 seconds
+          // Timpul a expirat, paywall-ul trebuie activat
           this.hasPaid = false;
           localStorage.removeItem("paymentTimestamp");
-          localStorage.setItem("hasPaid", "false"); // Persistă starea resetată
+          localStorage.setItem("hasPaid", "false");
         } else {
+          // Timpul nu a expirat, utilizatorul are acces
           this.hasPaid = true;
-          localStorage.setItem("hasPaid", "true"); // Persistă starea activă
+          localStorage.setItem("hasPaid", "true");
         }
       } else {
+        // Nu există timestamp, paywall-ul trebuie activat
         this.hasPaid = false;
-        localStorage.setItem("hasPaid", "false"); // Asigură-te că paywall-ul apare
+        localStorage.setItem("hasPaid", "false");
       }
     },
     validatePaywallOnLoad() {
+      // Validare imediată a stării fără a aștepta intervalul
+      this.validatePaymentTime();
+
+      // Setare starea locală pe baza rezultatului validării
       const hasPaid = localStorage.getItem("hasPaid");
       if (hasPaid === "true") {
         this.hasPaid = true;
       } else {
         this.hasPaid = false;
       }
-      this.validatePaymentTime();
+
+      // Pornire timer pentru actualizări continue
       this.startPaywallTimer();
     },
     startPaywallTimer() {
@@ -165,7 +172,7 @@ export default {
       }
       this.timerId = setInterval(() => {
         this.validatePaymentTime();
-      }, 1000);
+      }, 1000); // Verificare la fiecare secundă
     }
 },
 mounted() {
@@ -175,6 +182,7 @@ mounted() {
     script.type = "text/javascript";
     document.body.appendChild(script);
 
+    // Inițializare completă
     Promise.all([this.checkPaymentStatus(), this.validatePaywallOnLoad()])
       .then(() => console.log("Initialization complete."))
       .catch(error => console.error("Error during initialization:", error));
