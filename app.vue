@@ -247,7 +247,7 @@ export default {
   height: 100%;
   background: radial-gradient(circle, rgba(245, 39, 145, 0.15) 0%, rgba(245, 39, 145, 0.15) 60%);
   opacity: 0;
-  animation: sparkle 6s infinite ease-in-out;
+  animation: sparkle 3s infinite ease-in-out;
   pointer-events: none; /* Luminile nu vor interfera cu textul */
 }
 
@@ -264,6 +264,103 @@ export default {
     opacity: 1;
     transform: translate(100%, 100%) scale(1.2);
   }
+} /* Aici era problema: animația trebuie închisă! */
+
+.header p {
+  font-size: 1.2rem;
+  margin: 10px 0;
+}
+
+.paywall {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.paywall button {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.circle-container {
+  position: absolute;
+  top: 20%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.circle {
+  width: 50px;
+  height: 50px;
+  border: 2px solid white;
+  border-radius: 50%;
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.circle-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.widget {
+  position: fixed;
+  top: 50%;
+  left: 91%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+
+.description {
+  padding: 10px;
+  background: rgba(224, 200, 205, 0.57);
+  color: white;
+  border-radius: 25px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  width: 80%;
+  max-width: 900px;
+  margin: 0 auto;
+  font-size: 1.2rem;
+  position: fixed;
+  bottom: 20%;
+  left: 52%;
+  transform: translateX(-50%);
+  text-align: center;
+  white-space: normal;
+  line-height: 1.5;
+}
+
+.free-access-message {
+  position: fixed;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(245, 39, 145, 0.15);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 15px;
+  font-size: 16px;
+  z-index: 1000;
+  text-align: center;
+}
 }
 .header p {
   font-size: 1.2rem;
