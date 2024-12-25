@@ -25,6 +25,10 @@
           <p>{{ activeDescription }}</p>
         </div>
       </div>
+      <!-- Mesaj pentru timpul rămas -->
+      <div v-if="freeAccessTimeLeft > 0" class="free-access-message">
+        Free access for {{ freeAccessTimeLeft }} seconds
+      </div>
     </div>
   </div>
 </template>
@@ -72,141 +76,133 @@ export default {
       hasPaid: false,
       currentBackground: "https://i.giphy.com/fygfeYhDOPrhTOHZ7v.webp",
       activeDescription: null,
+      freeAccessTimeLeft: 60,
+      timerId: null
     };
   },
- methods: {
+  methods: {
     toggleWidget(index) {
-        this.agents.forEach((agent, idx) => {
-            agent.visible = idx === index ? !agent.visible : false;
-            if (agent.visible) {
-                this.currentBackground = agent.background;
-                this.activeDescription = agent.description;
-            }
-        });
+      this.agents.forEach((agent, idx) => {
+        agent.visible = idx === index ? !agent.visible : false;
+        if (agent.visible) {
+          this.currentBackground = agent.background;
+          this.activeDescription = agent.description;
+        }
+      });
     },
     async handlePayment() {
-        const stripe = await loadStripe(
-            "pk_live_51LhHVFJOzg3eyu5LJRnplRv2AKh0MGJEew4HhNbn3Eu2LfJkbZUv2j4lFNxulY5ugbb6wrh07QCaX0djdFnQ8f7A00tyuYKXEL"
-        );
+      const stripe = await loadStripe(
+        "pk_live_51LhHVFJOzg3eyu5LJRnplRv2AKh0MGJEew4HhNbn3Eu2LfJkbZUv2j4lFNxulY5ugbb6wrh07QCaX0djdFnQ8f7A00tyuYKXEL"
+      );
 
-        try {
-            const response = await fetch("/api/create-checkout-session", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" }
-            });
+      try {
+        const response = await fetch("/api/create-checkout-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" }
+        });
 
-            const { id } = await response.json();
-            if (!id) throw new Error("Session ID not received.");
-            localStorage.setItem("sessionId", id);
-            await stripe.redirectToCheckout({ sessionId: id });
-        } catch (error) {
-            console.error("Error during payment:", error.message);
-        }
+        const { id } = await response.json();
+        if (!id) throw new Error("Session ID not received.");
+        localStorage.setItem("sessionId", id);
+        await stripe.redirectToCheckout({ sessionId: id });
+      } catch (error) {
+        console.error("Error during payment:", error.message);
+      }
     },
     async checkPaymentStatus() {
-        try {
-            const sessionId = localStorage.getItem("sessionId");
-            if (!sessionId) {
-                console.error("Session ID is missing.");
-                this.hasPaid = false;
-                return;
-            }
-
-            const response = await fetch(`/api/check-payment-status?sessionId=${sessionId}`);
-            const data = await response.json();
-
-            if (data.hasPaid) {
-                this.hasPaid = true;
-                const paymentTimestamp = new Date().getTime();
-                localStorage.setItem("paymentTimestamp", paymentTimestamp);
-            } else {
-                this.hasPaid = false;
-                localStorage.removeItem("sessionId");
-            }
-        } catch (error) {
-            console.error("Error checking payment status:", error.message);
-            this.hasPaid = false;
-            localStorage.removeItem("sessionId");
+      try {
+        const sessionId = localStorage.getItem("sessionId");
+        if (!sessionId) {
+          console.error("Session ID is missing.");
+          this.hasPaid = false;
+          return;
         }
+
+        const response = await fetch(`/api/check-payment-status?sessionId=${sessionId}`);
+        const data = await response.json();
+
+        if (data.hasPaid) {
+          this.hasPaid = true;
+          const paymentTimestamp = new Date().getTime();
+          localStorage.setItem("paymentTimestamp", paymentTimestamp);
+        } else {
+          this.hasPaid = false;
+          localStorage.removeItem("sessionId");
+        }
+      } catch (error) {
+        console.error("Error checking payment status:", error.message);
+        this.hasPaid = false;
+        localStorage.removeItem("sessionId");
+      }
     },
     initializeFreeAccess() {
-        const freeAccessTimestamp = localStorage.getItem("freeAccessTimestamp");
-        if (!freeAccessTimestamp) {
-            // Dacă nu există un timestamp, setăm unul nou
-            const currentTime = new Date().getTime();
-            localStorage.setItem("freeAccessTimestamp", currentTime);
-        }
+      const freeAccessTimestamp = localStorage.getItem("freeAccessTimestamp");
+      if (!freeAccessTimestamp) {
+        const currentTime = new Date().getTime();
+        localStorage.setItem("freeAccessTimestamp", currentTime);
+      }
     },
     validateFreeAccess() {
-        const freeAccessTimestamp = localStorage.getItem("freeAccessTimestamp");
-        if (freeAccessTimestamp) {
-            const currentTime = new Date().getTime();
-            const elapsedSeconds = (currentTime - freeAccessTimestamp) / 1000;
+      const freeAccessTimestamp = localStorage.getItem("freeAccessTimestamp");
+      if (freeAccessTimestamp) {
+        const currentTime = new Date().getTime();
+        const elapsedSeconds = (currentTime - freeAccessTimestamp) / 1000;
 
-            if (elapsedSeconds >= 60) {
-                // Free access a expirat, aplicăm paywall-ul
-                this.hasPaid = false;
-                localStorage.setItem("hasPaid", "false");
-            } else {
-                // Free access este activ
-                this.hasPaid = true;
-                localStorage.setItem("hasPaid", "true");
-            }
+        this.freeAccessTimeLeft = Math.max(60 - Math.floor(elapsedSeconds), 0);
+
+        if (elapsedSeconds >= 60) {
+          this.hasPaid = false;
+          localStorage.setItem("hasPaid", "false");
         } else {
-            // Dacă nu există timestamp, aplicăm paywall-ul
-            this.hasPaid = false;
-            localStorage.setItem("hasPaid", "false");
+          this.hasPaid = true;
+          localStorage.setItem("hasPaid", "true");
         }
+      } else {
+        this.hasPaid = false;
+        localStorage.setItem("hasPaid", "false");
+      }
     },
     validatePaymentTime() {
-        const paymentTimestamp = localStorage.getItem("paymentTimestamp");
-        if (paymentTimestamp) {
-            const currentTime = new Date().getTime();
-            const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
+      const paymentTimestamp = localStorage.getItem("paymentTimestamp");
+      if (paymentTimestamp) {
+        const currentTime = new Date().getTime();
+        const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
 
-            if (elapsedSeconds >= 30) {
-                // Timpul a expirat, activăm paywall-ul
-                this.hasPaid = false;
-                localStorage.setItem("hasPaid", "false");
-                localStorage.removeItem("paymentTimestamp");
-            } else {
-                // Plata este activă, utilizatorul are acces
-                this.hasPaid = true;
-                localStorage.setItem("hasPaid", "true");
-            }
+        if (elapsedSeconds >= 30) {
+          this.hasPaid = false;
+          localStorage.setItem("hasPaid", "false");
+          localStorage.removeItem("paymentTimestamp");
         } else {
-            this.validateFreeAccess(); // Validăm accesul gratuit dacă nu există un paymentTimestamp
+          this.hasPaid = true;
+          localStorage.setItem("hasPaid", "true");
         }
+      } else {
+        this.validateFreeAccess();
+      }
     },
     validatePaywallOnLoad() {
-        // Inițializăm accesul gratuit dacă este prima vizită
-        this.initializeFreeAccess();
-
-        // Validăm starea paywall-ului
-        this.validatePaymentTime();
-
-        // Pornim un timer pentru verificări continue
-        this.startPaywallTimer();
+      this.initializeFreeAccess();
+      this.validatePaymentTime();
+      this.startPaywallTimer();
     },
     startPaywallTimer() {
-        if (this.timerId) {
-            clearInterval(this.timerId);
-        }
-        this.timerId = setInterval(() => {
-            this.validatePaymentTime();
-        }, 1000); // Verificare la fiecare secundă
+      if (this.timerId) {
+        clearInterval(this.timerId);
+      }
+      this.timerId = setInterval(() => {
+        this.validatePaymentTime();
+      }, 1000);
     }
-},
-mounted() {
+  },
+  mounted() {
     const script = document.createElement("script");
     script.src = "https://elevenlabs.io/convai-widget/index.js";
     script.async = true;
     script.type = "text/javascript";
     document.body.appendChild(script);
 
-    // Inițializare completă
     this.validatePaywallOnLoad();
-}
+  }
 };
 </script>
 
@@ -319,5 +315,19 @@ mounted() {
   text-align: center;
   white-space: normal;
   line-height: 1.5;
+}
+
+.free-access-message {
+  position: fixed;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  z-index: 1000;
+  text-align: center;
 }
 </style>
