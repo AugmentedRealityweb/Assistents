@@ -244,7 +244,7 @@ export default {
   width: 100%;
   display: flex;
   justify-content: center;
-  gap: 15px;
+  gap: 20px;
 }
 
 .circle {
