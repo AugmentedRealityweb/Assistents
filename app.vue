@@ -245,9 +245,9 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 60%);
+  background: radial-gradient(circle, rgba(245, 39, 145, 0.15) 0%, rgba(245, 39, 145, 0.15) 60%);
   opacity: 0;
-  animation: sparkle 3s infinite ease-in-out;
+  animation: sparkle 6s infinite ease-in-out;
   pointer-events: none; /* Luminile nu vor interfera cu textul */
 }
 
@@ -262,7 +262,7 @@ export default {
   }
   50% {
     opacity: 1;
-    transform: translate(100%, 100%) scale(1.2);
+    transform: translate(100%, 100%) scale(1.1);
   }
 }
 .header p {
@@ -275,7 +275,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(245, 39, 145, 0.15);
   color: white;
   padding: 20px;
   border-radius: 10px;
