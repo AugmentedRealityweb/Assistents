@@ -254,14 +254,14 @@ export default {
   padding: 10px;
   background: rgba(0, 0, 0, 0.8);
   color: white;
-  border-radius: 8px;
+  border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   width: 80%; /* Ensures the width spans a good horizontal space */
   max-width: 900px; /* Restricts the width for readability */
   margin: 0 auto;
   font-size: 1.2rem;
   position: fixed;
-  bottom: 10%; /* Positions the description box at the bottom */
+  bottom: 20%; /* Positions the description box at the bottom */
   left: 50%;
   transform: translateX(-50%);
   text-align: center; /* Centers the text inside the box */
