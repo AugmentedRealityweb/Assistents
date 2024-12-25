@@ -244,7 +244,7 @@ export default {
 
 .widget {
   position: fixed;
-  top: 40%;
+  top: 50%;
   left: 90%;
   transform: translate(-50%, -50%);
   z-index: 1000;
