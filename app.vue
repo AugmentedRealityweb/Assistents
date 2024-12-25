@@ -174,7 +174,6 @@ export default {
   align-items: center;
   width: 100vw;
   height: 100vh;
-  left: 50%;
   background-size: cover; /* Asigură că imaginea acoperă întregul ecran */
   background-position: center; /* Centrarea imaginii */
   background-repeat: no-repeat; /* Evită repetarea imaginii */
