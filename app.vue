@@ -139,7 +139,7 @@ export default {
           const currentTime = new Date().getTime();
           const elapsedMinutes = (currentTime - paymentTimestamp) / (1000 * 60);
 
-          if (elapsedMinutes >= 0.5) {
+          if (elapsedMinutes >= 1) {
             this.hasPaid = false;
             this.timerExpired = true;
             localStorage.removeItem("paymentTimestamp");
@@ -176,6 +176,21 @@ export default {
           }
         }, 1000);
       }
+    },
+    validatePaywallOnLoad() {
+      const paymentTimestamp = localStorage.getItem("paymentTimestamp");
+
+      if (paymentTimestamp) {
+        const currentTime = new Date().getTime();
+        const elapsedMinutes = (currentTime - paymentTimestamp) / (1000 * 60);
+
+        if (elapsedMinutes >= 30) {
+          this.hasPaid = false;
+          localStorage.removeItem("paymentTimestamp");
+        } else {
+          this.hasPaid = true;
+        }
+      }
     }
   },
   mounted() {
@@ -187,6 +202,7 @@ export default {
 
     this.checkPaymentStatus();
     this.startPaywallCheckInterval();
+    this.validatePaywallOnLoad();
 
     if (localStorage.getItem("timerExpired")) {
       this.timerExpired = true;
