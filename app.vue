@@ -73,7 +73,7 @@ export default {
         }
       ],
       hasPaid: false,
-      currentBackground: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp",
+      currentBackground: "https://i.giphy.com/fygfeYhDOPrhTOHZ7v.webp",
       activeDescription: null,
       timer: 60,
       timerVisible: false,
@@ -180,7 +180,7 @@ export default {
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background-size: cover;
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
   position: relative;
