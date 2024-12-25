@@ -89,86 +89,82 @@ export default {
     }
   },
   methods: {
-    async handlePayment() {
-      const stripe = await loadStripe(
-        "pk_live_51LhHVFJOzg3eyu5LJRnplRv2AKh0MGJEew4HhNbn3Eu2LfJkbZUv2j4lFNxulY5ugbb6wrh07QCaX0djdFnQ8f7A00tyuYKXEL"
-      );
+  async handlePayment() {
+    const stripe = await loadStripe(
+      "pk_live_51LhHVFJOzg3eyu5LJRnplRv2AKh0MGJEew4HhNbn3Eu2LfJkbZUv2j4lFNxulY5ugbb6wrh07QCaX0djdFnQ8f7A00tyuYKXEL"
+    );
 
-      try {
-        const response = await fetch("/api/create-checkout-session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" }
-        });
-
-        const { id } = await response.json();
-        localStorage.setItem("sessionId", id);
-        await stripe.redirectToCheckout({ sessionId: id });
-      } catch (error) {
-        console.error("Error during payment:", error.message);
-      }
-    },
-    async checkPaymentStatus() {
-      try {
-        const sessionId = localStorage.getItem("sessionId");
-        if (!sessionId) {
-          console.error("Session ID is missing.");
-          return;
-        }
-
-        const response = await fetch(
-          `/api/check-payment-status?sessionId=${sessionId}`
-        );
-        const data = await response.json();
-
-        this.hasPaid = data.hasPaid;
-      } catch (error) {
-        console.error("Error checking payment status:", error.message);
-      }
-    },
-    toggleWidget(index) {
-      this.agents.forEach((agent, idx) => {
-        agent.visible = idx === index ? !agent.visible : false;
-        if (agent.visible) {
-          this.currentBackground = agent.background;
-          this.activeDescription = agent.description;
-        }
+    try {
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
       });
-      this.startTimer();
-    },
-    startTimer() {
-      if (!this.timerVisible && !this.timerExpired) {
-        if (localStorage.getItem("timerExpired")) {
-          this.timerExpired = true;
-          this.timerVisible = false;
-          return;
-        }
-        this.timerVisible = true;
-        this.timerInterval = setInterval(() => {
-          if (this.timer > 0) {
-            this.timer--;
-          } else {
-            clearInterval(this.timerInterval);
-            this.timerExpired = true;
-            this.timerVisible = false;
-            localStorage.setItem("timerExpired", "true");
-          }
-        }, 1000);
-      }
+
+      const { id } = await response.json();
+      localStorage.setItem("sessionId", id);
+      await stripe.redirectToCheckout({ sessionId: id });
+    } catch (error) {
+      console.error("Error during payment:", error.message);
     }
   },
-  mounted() {
-    const script = document.createElement("script");
-    script.src = "https://elevenlabs.io/convai-widget/index.js";
-    script.async = true;
-    script.type = "text/javascript";
-    document.body.appendChild(script);
+  async checkPaymentStatus() {
+    try {
+      const sessionId = localStorage.getItem("sessionId");
+      if (!sessionId) {
+        console.error("Session ID is missing.");
+        return;
+      }
 
-    this.checkPaymentStatus();
+      const response = await fetch(
+        `/api/check-payment-status?sessionId=${sessionId}`
+      );
+      const data = await response.json();
 
-    if (localStorage.getItem("timerExpired")) {
-      this.timerExpired = true;
+      if (data.hasPaid) {
+        this.hasPaid = true;
+
+        // Salvează timestamp-ul de plată
+        const paymentTimestamp = new Date().getTime();
+        localStorage.setItem("paymentTimestamp", paymentTimestamp);
+      } else {
+        this.hasPaid = false;
+      }
+    } catch (error) {
+      console.error("Error checking payment status:", error.message);
+    }
+  },
+  checkPaymentStatusOnLoad() {
+    const paymentTimestamp = localStorage.getItem("paymentTimestamp");
+
+    if (paymentTimestamp) {
+      const currentTime = new Date().getTime();
+      const elapsedMinutes = (currentTime - paymentTimestamp) / (1000 * 60);
+
+      if (elapsedMinutes >= 30) {
+        this.hasPaid = false;
+        localStorage.removeItem("paymentTimestamp");
+      } else {
+        this.hasPaid = true;
+      }
+    } else {
+      // Dacă nu există timestamp, verificăm starea plății
+      this.checkPaymentStatus();
     }
   }
+},
+mounted() {
+  const script = document.createElement("script");
+  script.src = "https://elevenlabs.io/convai-widget/index.js";
+  script.async = true;
+  script.type = "text/javascript";
+  document.body.appendChild(script);
+
+  this.checkPaymentStatusOnLoad();
+
+  if (localStorage.getItem("timerExpired")) {
+    this.timerExpired = true;
+  }
+}
 };
 </script>
 
