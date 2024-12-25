@@ -120,39 +120,35 @@ export default {
         );
         const data = await response.json();
 
-        this.hasPaid = data.hasPaid;
+        if (data.hasPaid) {
+          this.hasPaid = true;
+
+          // Salvează timestamp-ul de plată
+          const paymentTimestamp = new Date().getTime();
+          localStorage.setItem("paymentTimestamp", paymentTimestamp);
+        } else {
+          this.hasPaid = false;
+        }
       } catch (error) {
         console.error("Error checking payment status:", error.message);
       }
     },
-    toggleWidget(index) {
-      this.agents.forEach((agent, idx) => {
-        agent.visible = idx === index ? !agent.visible : false;
-        if (agent.visible) {
-          this.currentBackground = agent.background;
-          this.activeDescription = agent.description;
+    checkPaymentStatusOnLoad() {
+      const paymentTimestamp = localStorage.getItem("paymentTimestamp");
+
+      if (paymentTimestamp) {
+        const currentTime = new Date().getTime();
+        const elapsedMinutes = (currentTime - paymentTimestamp) / (1000 * 60);
+
+        if (elapsedMinutes >= 30) {
+          this.hasPaid = false;
+          localStorage.removeItem("paymentTimestamp");
+        } else {
+          this.hasPaid = true;
         }
-      });
-      this.startTimer();
-    },
-    startTimer() {
-      if (!this.timerVisible && !this.timerExpired) {
-        if (localStorage.getItem("timerExpired")) {
-          this.timerExpired = true;
-          this.timerVisible = false;
-          return;
-        }
-        this.timerVisible = true;
-        this.timerInterval = setInterval(() => {
-          if (this.timer > 0) {
-            this.timer--;
-          } else {
-            clearInterval(this.timerInterval);
-            this.timerExpired = true;
-            this.timerVisible = false;
-            localStorage.setItem("timerExpired", "true");
-          }
-        }, 1000);
+      } else {
+        // Dacă nu există timestamp, verificăm starea plății
+        this.checkPaymentStatus();
       }
     }
   },
@@ -163,7 +159,7 @@ export default {
     script.type = "text/javascript";
     document.body.appendChild(script);
 
-    this.checkPaymentStatus();
+    this.checkPaymentStatusOnLoad();
 
     if (localStorage.getItem("timerExpired")) {
       this.timerExpired = true;
