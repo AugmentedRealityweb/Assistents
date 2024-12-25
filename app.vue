@@ -178,8 +178,8 @@ export default {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  width: 120vw;
-  height: 120vh;
+  width: 900vw;
+  height: 900vh;
   background-size: cover; /* Asigură că imaginea acoperă întregul ecran */
   background-position: center; /* Centrarea imaginii */
   background-repeat: no-repeat; /* Evită repetarea imaginii */
