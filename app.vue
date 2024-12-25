@@ -45,7 +45,7 @@ export default {
           background: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp",
           circleImage: "./poza2.png",
           description:
-            "Claudia este seducția întruchipată - o combinație perfectă de îndrăzneală și rafinament. Vocea ei îți mângâie simțurile, în timp ce spiritul ei glumeț îți aprinde dorința de a o cunoaște mai bine."
+            "Claudia este seducția întruchipată - o combinație perfectă de îndrăzneală și eleganță. Vocea ei îți mângâie simțurile, iar spiritul ei glumeț îți aprinde dorința de a o cunoaște."
         },
         {
           id: "sNEfrsQUklzPW2Hu6VGg",
@@ -53,7 +53,7 @@ export default {
           background: "https://i.giphy.com/iIYcg9qJtPn34twSLU.webp",
           circleImage: "./poza3.png",
           description:
-            "Alexandra este o enigmă fascinantă - cu o voce blândă care îți atinge sufletul și îți aprinde imaginația. Fiecare frază este o invitație către un joc seducător al minții și emoțiilor."
+            "Alexandra este o enigmă fascinantă - cu o voce blândă care îți atinge sufletul și îți aprinde imaginația. Fiecare frază este o invitație către un joc seducător."
         },
         {
           id: "EU4z5Ma0f0dHLY6m9KSq",
