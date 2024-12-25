@@ -42,7 +42,7 @@ export default {
         {
           id: "5mz0QGMTS6vciobpmiXO",
           visible: false,
-          background: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp",
+          background: "https://i.giphy.com/CMCGp9yJG3pTuRcSGu.webp",
           circleImage: "./poza2.png",
           description:
             "Claudia este seducția întruchipată - o combinație perfectă de îndrăzneală și eleganță. Vocea ei îți mângâie simțurile, iar spiritul ei glumeț îți aprinde dorința."
@@ -50,7 +50,7 @@ export default {
         {
           id: "sNEfrsQUklzPW2Hu6VGg",
           visible: false,
-          background: "https://i.giphy.com/iIYcg9qJtPn34twSLU.webp",
+          background: "https://i.giphy.com/1qQ5lOKrgpai8EWGlo.webp",
           circleImage: "./poza3.png",
           description:
             "Alexandra este o enigmă fascinantă - cu o voce blândă care îți atinge sufletul și îți aprinde imaginația. Fiecare frază este o invitație către un joc seducător."
@@ -58,7 +58,7 @@ export default {
         {
           id: "EU4z5Ma0f0dHLY6m9KSq",
           visible: false,
-          background: "https://i.giphy.com/xTg8Bd9jyppDHgvjQQ.webp",
+          background: "https://i.giphy.com/tY3S7GJlVOyhO0TOid.webp",
           circleImage: "./poza4.png",
           description:
             "Patricia are un farmec irezistibil -  cu o voce care îți șoptește promisiuni subtile și te poartă într-o lume unde totul pare posibil. Jucăușă și fermecătoare."
@@ -66,7 +66,7 @@ export default {
         {
           id: "Hd79ohSgVoA9LkZcEhRG",
           visible: false,
-          background: "https://i.giphy.com/xULW8LuH8tqB4H0Egg.webp",
+          background: "https://i.giphy.com/XR82em41ScZ45Uk1m5.webp",
           circleImage: "./poza.png",
           description:
             "Angela este seducția întruchipată - cu o voce caldă și un aer jucăuș, știe exact cum să te facă să zâmbești și să-ți simți inima bătând mai repede."
