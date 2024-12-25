@@ -262,7 +262,7 @@ export default {
   font-size: 1.2rem;
   position: fixed;
   bottom: 20%; /* Positions the description box at the bottom */
-  left: 50%;
+  left: 49%;
   transform: translateX(-50%);
   text-align: center; /* Centers the text inside the box */
   white-space: normal; /* Allows the text to wrap */
