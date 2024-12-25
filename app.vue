@@ -4,11 +4,14 @@
       <div class="header">
         <h1>Conversații Fierbinți
         <span class="sparkle"></span>
-    <span class="sparkle"></span>
-    <span class="sparkle"></span>
-    <span class="sparkle"></span>
-    <span class="sparkle">
-       </span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
+        <span class="sparkle"></span>
        </h1>
         <p>Selectează un model pentru a începe conversația.</p>
       </div>
@@ -248,7 +251,7 @@ export default {
   position: absolute;
   width: 10px;
   height: 10px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+  background: radial-gradient(circle, rgba(245, 39, 145, 0.15) 0%, rgba(245, 39, 145, 0.10) 70%);
   border-radius: 50%;
   animation: sparkleAnimation 3s infinite ease-in-out;
   opacity: 0; /* Începem cu punctul ascuns */
@@ -286,6 +289,29 @@ export default {
   animation-delay: 2.5s;
 }
 
+  .header h1 .sparkle:nth-child(2) {
+  top: 65%;
+  left: 20%;
+  animation-delay: 2s;
+}
+
+  header h1 .sparkle:nth-child(2) {
+  top: 25%;
+  left: 50%;
+  animation-delay: 2s;
+}
+
+  header h1 .sparkle:nth-child(2) {
+  top: 38%;
+  left: 10%;
+  animation-delay: 2s;
+}
+
+  header h1 .sparkle:nth-child(2) {
+  top: 52%;
+  left: 60%;
+  animation-delay: 2s;
+}
 /* Animația pentru aprinderea și stingerea licuricilor */
 @keyframes sparkleAnimation {
   0%, 100% {
