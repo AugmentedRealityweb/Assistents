@@ -129,7 +129,6 @@ export default {
         localStorage.removeItem("sessionId");
       }
     },
-    methods: {
     validatePaymentTime() {
       const paymentTimestamp = localStorage.getItem("paymentTimestamp");
       if (paymentTimestamp) {
