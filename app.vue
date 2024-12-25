@@ -217,6 +217,8 @@ export default {
   margin-top: 10px;
   color: white;
   font-size: 1.2rem;
+  bottom: 5%;
+  left: 50%;
 }
 
 .circle-container {
