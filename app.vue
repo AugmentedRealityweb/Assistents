@@ -262,7 +262,7 @@ export default {
   }
   50% {
     opacity: 1;
-    transform: translate(100%, 100%) scale(1.1);
+    transform: translate(100%, 100%) scale(1.2);
   }
 }
 .header p {
