@@ -178,11 +178,13 @@ export default {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  width: 200vw;
+  width: 100vw;
   height: 100vh;
-  background-size: cover%;
-  background-position: center;
-  background-repeat: no-repeat;
+  background-size: cover; /* Asigură că imaginea acoperă întregul ecran */
+  background-position: center; /* Centrarea imaginii */
+  background-repeat: no-repeat; /* Evită repetarea imaginii */
+  margin: 0; /* Elimină eventuale margini */
+  padding: 0; /* Elimină padding */
   position: relative;
   color: white;
   text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
