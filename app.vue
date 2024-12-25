@@ -138,6 +138,11 @@ export default {
           this.hasPaid = true;
         }
       }
+    },
+    validatePaywallInterval() {
+      setInterval(() => {
+        this.validatePaymentTime();
+      }, 30000); // Re-check every 30 seconds
     }
   },
   mounted() {
@@ -149,6 +154,7 @@ export default {
 
     this.validatePaymentTime();
     this.checkPaymentStatus();
+    this.validatePaywallInterval();
   }
 };
 </script>
