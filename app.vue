@@ -5,7 +5,7 @@
         <h1>Conversții Fierbinți</h1>
         <p>Selectează un model pentru a începe conversația.</p>
       </div>
-      <div class="paywall" v-if="!hasPaid && timerExpired">
+      <div class="paywall" v-if="!hasPaid">
         <p>Continuă conversația cu doar 30RON</p>
         <button @click="handlePayment">Pay Now</button>
       </div>
@@ -23,9 +23,6 @@
         </div>
         <div class="description" v-if="activeDescription">
           <p>{{ activeDescription }}</p>
-        </div>
-        <div class="timer" v-if="!timerExpired && timerVisible">
-          Free time remaining: {{ formattedTime }}
         </div>
       </div>
     </div>
@@ -75,18 +72,7 @@ export default {
       hasPaid: false,
       currentBackground: "https://i.giphy.com/fygfeYhDOPrhTOHZ7v.webp",
       activeDescription: null,
-      timer: 60,
-      timerVisible: false,
-      timerExpired: false,
-      timerInterval: null
     };
-  },
-  computed: {
-    formattedTime() {
-      const minutes = Math.floor(this.timer / 60);
-      const seconds = this.timer % 60;
-      return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-    }
   },
   methods: {
     async handlePayment() {
@@ -131,60 +117,12 @@ export default {
         console.error("Error checking payment status:", error.message);
       }
     },
-    startPaywallCheckInterval() {
-      setInterval(() => {
-        const paymentTimestamp = localStorage.getItem("paymentTimestamp");
-
-        if (paymentTimestamp) {
-          const currentTime = new Date().getTime();
-          const elapsedMinutes = (currentTime - paymentTimestamp) / (1000 * 60);
-
-          if (elapsedMinutes >= 0.5) {
-            this.hasPaid = false;
-            this.timerExpired = true;
-            localStorage.removeItem("paymentTimestamp");
-          }
-        }
-      }, 1000);
-    },
-    toggleWidget(index) {
-      this.agents.forEach((agent, idx) => {
-        agent.visible = idx === index ? !agent.visible : false;
-        if (agent.visible) {
-          this.currentBackground = agent.background;
-          this.activeDescription = agent.description;
-        }
-      });
-      this.startTimer();
-    },
-    startTimer() {
-      if (!this.timerVisible && !this.timerExpired) {
-        if (localStorage.getItem("timerExpired")) {
-          this.timerExpired = true;
-          this.timerVisible = false;
-          return;
-        }
-        this.timerVisible = true;
-        this.timerInterval = setInterval(() => {
-          if (this.timer > 0) {
-            this.timer--;
-          } else {
-            clearInterval(this.timerInterval);
-            this.timerExpired = true;
-            this.timerVisible = false;
-            localStorage.setItem("timerExpired", "true");
-          }
-        }, 1000);
-      }
-    },
-    validatePaywallOnLoad() {
+    validatePaymentTime() {
       const paymentTimestamp = localStorage.getItem("paymentTimestamp");
-
       if (paymentTimestamp) {
         const currentTime = new Date().getTime();
         const elapsedMinutes = (currentTime - paymentTimestamp) / (1000 * 60);
-
-        if (elapsedMinutes >= 30) {
+        if (elapsedMinutes >= 0.5) {
           this.hasPaid = false;
           localStorage.removeItem("paymentTimestamp");
         } else {
@@ -200,13 +138,8 @@ export default {
     script.type = "text/javascript";
     document.body.appendChild(script);
 
+    this.validatePaymentTime();
     this.checkPaymentStatus();
-    this.startPaywallCheckInterval();
-    this.validatePaywallOnLoad();
-
-    if (localStorage.getItem("timerExpired")) {
-      this.timerExpired = true;
-    }
   }
 };
 </script>
@@ -217,8 +150,8 @@ export default {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  width: 105vw;
-  height: 105vh;
+  width: 100vw;
+  height: 100vh;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -263,20 +196,6 @@ export default {
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
-}
-
-.timer {
-  color: white;
-  font-size: 1.5rem;
-  position: fixed;
-  bottom: 5%;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-  background: rgba(0, 0, 0, 0.8);
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .circle-container {
