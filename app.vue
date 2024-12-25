@@ -88,7 +88,7 @@ export default {
       return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
     }
   },
-     methods: {
+  methods: {
     async handlePayment() {
       const stripe = await loadStripe(
         "pk_live_51LhHVFJOzg3eyu5LJRnplRv2AKh0MGJEew4HhNbn3Eu2LfJkbZUv2j4lFNxulY5ugbb6wrh07QCaX0djdFnQ8f7A00tyuYKXEL"
@@ -120,35 +120,39 @@ export default {
         );
         const data = await response.json();
 
-        if (data.hasPaid) {
-          this.hasPaid = true;
-
-          // Salvează timestamp-ul de plată
-          const paymentTimestamp = new Date().getTime();
-          localStorage.setItem("paymentTimestamp", paymentTimestamp);
-        } else {
-          this.hasPaid = false;
-        }
+        this.hasPaid = data.hasPaid;
       } catch (error) {
         console.error("Error checking payment status:", error.message);
       }
     },
-    checkPaymentStatusOnLoad() {
-      const paymentTimestamp = localStorage.getItem("paymentTimestamp");
-
-      if (paymentTimestamp) {
-        const currentTime = new Date().getTime();
-        const elapsedMinutes = (currentTime - paymentTimestamp) / (1000 * 60);
-
-        if (elapsedMinutes >= 30) {
-          this.hasPaid = false;
-          localStorage.removeItem("paymentTimestamp");
-        } else {
-          this.hasPaid = true;
+    toggleWidget(index) {
+      this.agents.forEach((agent, idx) => {
+        agent.visible = idx === index ? !agent.visible : false;
+        if (agent.visible) {
+          this.currentBackground = agent.background;
+          this.activeDescription = agent.description;
         }
-      } else {
-        // Dacă nu există timestamp, verificăm starea plății
-        this.checkPaymentStatus();
+      });
+      this.startTimer();
+    },
+    startTimer() {
+      if (!this.timerVisible && !this.timerExpired) {
+        if (localStorage.getItem("timerExpired")) {
+          this.timerExpired = true;
+          this.timerVisible = false;
+          return;
+        }
+        this.timerVisible = true;
+        this.timerInterval = setInterval(() => {
+          if (this.timer > 0) {
+            this.timer--;
+          } else {
+            clearInterval(this.timerInterval);
+            this.timerExpired = true;
+            this.timerVisible = false;
+            localStorage.setItem("timerExpired", "true");
+          }
+        }, 1000);
       }
     }
   },
@@ -159,7 +163,7 @@ export default {
     script.type = "text/javascript";
     document.body.appendChild(script);
 
-    this.checkPaymentStatusOnLoad();
+    this.checkPaymentStatus();
 
     if (localStorage.getItem("timerExpired")) {
       this.timerExpired = true;
@@ -174,8 +178,8 @@ export default {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  width: 100vw;
-  height: 100vh;
+  width: 105vw;
+  height: 105vh;
   background-size: cover; /* Asigură că imaginea acoperă întregul ecran */
   background-position: center; /* Centrarea imaginii */
   background-repeat: no-repeat; /* Evită repetarea imaginii */
