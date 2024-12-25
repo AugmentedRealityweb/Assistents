@@ -122,7 +122,6 @@ export default {
 
         if (data.hasPaid) {
           this.hasPaid = true;
-
           const paymentTimestamp = new Date().getTime();
           localStorage.setItem("paymentTimestamp", paymentTimestamp);
         } else {
@@ -142,6 +141,7 @@ export default {
 
           if (elapsedMinutes >= 1) {
             this.hasPaid = false;
+            this.timerExpired = true;
             localStorage.removeItem("paymentTimestamp");
           }
         }
