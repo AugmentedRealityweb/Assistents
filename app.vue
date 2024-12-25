@@ -253,7 +253,7 @@ export default {
 .description {
   all: unset; /* Elimină toate stilurile implicite */
   position: fixed; /* Reaplică stilurile tale */
-  bottom: -70px;
+  bottom: -10px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.8);
