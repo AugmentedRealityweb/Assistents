@@ -252,7 +252,7 @@ export default {
 
 .description {
   padding: 10px;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(211, 199, 205, 0.56);
   color: white;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
@@ -262,7 +262,7 @@ export default {
   font-size: 1.2rem;
   position: fixed;
   bottom: 20%; /* Positions the description box at the bottom */
-  left: 49%;
+  left: 52%;
   transform: translateX(-50%);
   text-align: center; /* Centers the text inside the box */
   white-space: normal; /* Allows the text to wrap */
