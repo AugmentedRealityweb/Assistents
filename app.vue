@@ -129,6 +129,7 @@ export default {
         localStorage.removeItem("sessionId");
       }
     },
+    methods: {
     validatePaymentTime() {
       const paymentTimestamp = localStorage.getItem("paymentTimestamp");
       if (paymentTimestamp) {
@@ -136,16 +137,26 @@ export default {
         const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
 
         if (elapsedSeconds >= 30) {
+          // Reset paywall after 30 seconds
           this.hasPaid = false;
           localStorage.removeItem("paymentTimestamp");
+          localStorage.setItem("hasPaid", "false"); // Persistă starea resetată
         } else {
           this.hasPaid = true;
+          localStorage.setItem("hasPaid", "true"); // Persistă starea activă
         }
       } else {
         this.hasPaid = false;
+        localStorage.setItem("hasPaid", "false"); // Asigură-te că paywall-ul apare
       }
     },
     validatePaywallOnLoad() {
+      const hasPaid = localStorage.getItem("hasPaid");
+      if (hasPaid === "true") {
+        this.hasPaid = true;
+      } else {
+        this.hasPaid = false;
+      }
       this.validatePaymentTime();
       this.startPaywallTimer();
     },
@@ -157,8 +168,8 @@ export default {
         this.validatePaymentTime();
       }, 1000);
     }
-  },
-  mounted() {
+},
+mounted() {
     const script = document.createElement("script");
     script.src = "https://elevenlabs.io/convai-widget/index.js";
     script.async = true;
@@ -168,7 +179,7 @@ export default {
     Promise.all([this.checkPaymentStatus(), this.validatePaywallOnLoad()])
       .then(() => console.log("Initialization complete."))
       .catch(error => console.error("Error during initialization:", error));
-  }
+}
 };
 </script>
 
