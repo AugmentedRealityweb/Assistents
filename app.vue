@@ -5,13 +5,9 @@
         <h1>Virtual Assistant Hub</h1>
         <p>Select an assistant by clicking on a circle below.</p>
       </div>
-      <div class="paywall" v-if="!hasPaid && showPaywall">
+      <div class="paywall" v-if="!hasPaid && timerExpired">
         <p>Unlock full access for just 2 RON!</p>
-        <p>Time expired. Please pay to continue.</p>
         <button @click="handlePayment">Pay Now</button>
-      </div>
-      <div v-if="!showPaywall && !hasPaid" class="timer">
-        <p>Free usage time remaining: {{ remainingTime }} seconds</p>
       </div>
       <div class="circle-container" v-else>
         <div
@@ -22,14 +18,14 @@
         >
           <img :src="agent.circleImage" alt="Agent Circle" class="circle-image" />
         </div>
-      </div>
-
-      <div class="widget-container" v-if="agents.some(agent => agent.visible)">
-        <div class="widget" @click="startTimer">
+        <div class="widget" v-if="agents.some(agent => agent.visible)" @click.stop>
           <elevenlabs-convai :agent-id="agents.find(agent => agent.visible).id"></elevenlabs-convai>
         </div>
-        <div class="description">
-          {{ agents.find(agent => agent.visible).description }}
+        <div class="description" v-if="activeDescription">
+          <p>{{ activeDescription }}</p>
+        </div>
+        <div class="timer" v-if="!timerExpired && timerVisible">
+          Free time remaining: {{ formattedTime }}
         </div>
       </div>
     </div>
@@ -48,37 +44,49 @@ export default {
           visible: false,
           background: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp",
           circleImage: "./poza2.png",
-          description: "Claudia este seducția întruchipată - o combinație perfectă de îndrăzneală și eleganță. Vocea ei îți mângâie simțurile, iar spiritul ei glumeț îți aprinde dorința."
+          description:
+            "Claudia este seducția întruchipată - o combinație perfectă de îndrăzneală și eleganță. Vocea ei îți mângâie simțurile, iar spiritul ei glumeț îți aprinde dorința."
         },
         {
           id: "sNEfrsQUklzPW2Hu6VGg",
           visible: false,
           background: "https://i.giphy.com/iIYcg9qJtPn34twSLU.webp",
           circleImage: "./poza3.png",
-          description: "Alexandra este o enigmă fascinantă - cu o voce blândă care îți atinge sufletul și îți aprinde imaginația. Fiecare frază este o invitație către un joc seducător."
+          description:
+            "Alexandra este o enigmă fascinantă - cu o voce blândă care îți atinge sufletul și îți aprinde imaginația. Fiecare frază este o invitație către un joc seducător."
         },
         {
           id: "EU4z5Ma0f0dHLY6m9KSq",
           visible: false,
           background: "https://i.giphy.com/xTg8Bd9jyppDHgvjQQ.webp",
           circleImage: "./poza4.png",
-          description: "Patricia are un farmec irezistibil - Jucăușă și fermecătoare, își folosește inteligența și căldura pentru a te captiva complet."
+          description:
+            "Patricia are un farmec irezistibil -  cu o voce care îți șoptește promisiuni subtile și te poartă într-o lume unde totul pare posibil. Jucăușă și fermecătoare."
         },
         {
           id: "Hd79ohSgVoA9LkZcEhRG",
           visible: false,
           background: "https://i.giphy.com/xULW8LuH8tqB4H0Egg.webp",
           circleImage: "./poza.png",
-          description: "Angela este seducția întruchipată – cu o voce caldă și un aer jucăuș, știe exact cum să te facă să zâmbești și să-ți simți inima bătând mai repede."
+          description:
+            "Angela este seducția întruchipată - cu o voce caldă și un aer jucăuș, știe exact cum să te facă să zâmbești și să-ți simți inima bătând mai repede."
         }
       ],
       hasPaid: false,
-      showPaywall: false,
       currentBackground: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp",
-      remainingTime: 60,
-      timer: null,
-      timerStarted: false
+      activeDescription: null,
+      timer: 60,
+      timerVisible: false,
+      timerExpired: false,
+      timerInterval: null
     };
+  },
+  computed: {
+    formattedTime() {
+      const minutes = Math.floor(this.timer / 60);
+      const seconds = this.timer % 60;
+      return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+    }
   },
   methods: {
     async handlePayment() {
@@ -89,7 +97,7 @@ export default {
       try {
         const response = await fetch("/api/create-checkout-session", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json" }
         });
 
         const { id } = await response.json();
@@ -122,18 +130,21 @@ export default {
         agent.visible = idx === index ? !agent.visible : false;
         if (agent.visible) {
           this.currentBackground = agent.background;
+          this.activeDescription = agent.description;
         }
       });
+      this.startTimer();
     },
     startTimer() {
-      if (!this.timerStarted) {
-        this.timerStarted = true;
-        this.timer = setInterval(() => {
-          if (this.remainingTime > 0) {
-            this.remainingTime--;
+      if (!this.timerVisible && !this.timerExpired) {
+        this.timerVisible = true;
+        this.timerInterval = setInterval(() => {
+          if (this.timer > 0) {
+            this.timer--;
           } else {
-            this.showPaywall = true;
-            clearInterval(this.timer);
+            clearInterval(this.timerInterval);
+            this.timerExpired = true;
+            this.timerVisible = false;
           }
         }, 1000);
       }
@@ -162,9 +173,6 @@ export default {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  border: 5px solid black;
-  box-sizing: border-box;
-  overflow: hidden;
   position: relative;
   color: white;
   text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
@@ -227,7 +235,6 @@ export default {
   border-radius: 50%;
   cursor: pointer;
   background-color: rgba(255, 255, 255, 0.8);
-  animation: float 7s ease-in-out infinite;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -256,28 +263,16 @@ export default {
   color: white;
   border-radius: 25px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  width: 80%; /* Ensures the width spans a good horizontal space */
-  max-width: 900px; /* Restricts the width for readability */
+  width: 80%;
+  max-width: 900px;
   margin: 0 auto;
   font-size: 1.2rem;
   position: fixed;
-  bottom: 20%; /* Positions the description box at the bottom */
+  bottom: 20%;
   left: 52%;
   transform: translateX(-50%);
-  text-align: center; /* Centers the text inside the box */
-  white-space: normal; /* Allows the text to wrap */
-  line-height: 1.5; /* Improves line spacing for readability */
-}
-
-@keyframes float {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-  100% {
-    transform: translateY(0);
-  }
+  text-align: center;
+  white-space: normal;
+  line-height: 1.5;
 }
 </style>
