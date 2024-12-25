@@ -244,8 +244,8 @@ export default {
 
 .widget {
   position: fixed;
-  top: 45%;
-  left: 91%;
+  top: 40%;
+  left: 90%;
   transform: translate(-50%, -50%);
   z-index: 1000;
 }
@@ -254,7 +254,7 @@ export default {
   padding: 10px;
   background: rgba(211, 199, 205, 0.56);
   color: white;
-  border-radius: 10px;
+  border-radius: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   width: 80%; /* Ensures the width spans a good horizontal space */
   max-width: 900px; /* Restricts the width for readability */
