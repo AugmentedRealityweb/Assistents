@@ -214,11 +214,17 @@ export default {
 }
 
 .timer {
-  margin-top: 10px;
   color: white;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
+  position: fixed;
   bottom: 5%;
   left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .circle-container {
