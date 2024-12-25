@@ -2,7 +2,7 @@
   <div id="app">
     <div class="container" :style="{ backgroundImage: `url(${currentBackground})` }">
       <div class="header">
-        <h1>Conversții Fierbinți</h1>
+        <h1>Conversații Fierbinți</h1>
         <p>Selectează un model pentru a începe conversația.</p>
       </div>
       <div class="paywall" v-if="!hasPaid">
@@ -54,12 +54,12 @@ export default {
           background: "https://i.giphy.com/1qQ5lOKrgpai8EWGlo.webp",
           circleImage: "./poza3.png",
           description:
-            "Alexandra este o enigmă fascinantă - cu o voce blândă care îți atinge sufletul și îți aprinde imaginația. Fiecare frază este o invitație către un joc seducător."
+            "Delia este o enigmă fascinantă - cu o voce blândă care îți atinge sufletul și îți aprinde imaginația. Fiecare frază este o invitație către un joc seducător."
         },
         {
           id: "EU4z5Ma0f0dHLY6m9KSq",
           visible: false,
-          background: "https://i.giphy.com/tY3S7GJlVOyhO0TOid.webp",
+          background: "https://i.giphy.com/NzavBMIQ3CGxtMlOcv.webp",
           circleImage: "./poza4.png",
           description:
             "Patricia are un farmec irezistibil -  cu o voce care îți șoptește promisiuni subtile și te poartă într-o lume unde totul pare posibil. Jucăușă și fermecătoare."
@@ -233,7 +233,37 @@ export default {
   font-size: 2.5rem;
   margin: 0;
   color: rgba(247, 0, 44, 0.8);
+  position: relative;
+  overflow: hidden; /* Ascunde luminile care ies din element */
 }
+
+.header h1::before,
+.header h1::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 60%);
+  opacity: 0;
+  animation: sparkle 3s infinite ease-in-out;
+  pointer-events: none; /* Luminile nu vor interfera cu textul */
+}
+
+.header h1::after {
+  animation-delay: 1.5s; /* Pentru a alterna luminile */
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: translate(-100%, -100%) scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(100%, 100%) scale(1.2);
+  }
 
 .header p {
   font-size: 1.2rem;
@@ -322,10 +352,10 @@ export default {
   bottom: 5px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(245, 39, 145, 0.15);
   color: white;
   padding: 10px 20px;
-  border-radius: 5px;
+  border-radius: 15px;
   font-size: 16px;
   z-index: 1000;
   text-align: center;
