@@ -231,7 +231,7 @@ export default {
   margin: 0;
   padding: 0;
   position: relative;
-  color: white;
+  color: #5c2478;
   text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
 }
 
