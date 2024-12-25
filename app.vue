@@ -264,7 +264,7 @@ export default {
     opacity: 1;
     transform: translate(100%, 100%) scale(1.2);
   }
-
+}
 .header p {
   font-size: 1.2rem;
   margin: 10px 0;
