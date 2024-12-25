@@ -2,8 +2,8 @@
   <div id="app">
     <div class="container" :style="{ backgroundImage: `url(${currentBackground})` }">
       <div class="header">
-        <h1>Virtual Assistant Hub</h1>
-        <p>Select an assistant by clicking on a circle below.</p>
+        <h1>Conversții Fierbinți și Profunde</h1>
+        <p>Selectează un model pentru a începe conversația.</p>
       </div>
       <div class="paywall" v-if="!hasPaid && timerExpired">
         <p>Continuă conversația cu doar 30RON</p>
