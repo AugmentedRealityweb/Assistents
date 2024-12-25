@@ -217,6 +217,16 @@ export default {
 </script>
 
 <style scoped>
+  {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
 .container {
   display: flex;
   flex-direction: column;
@@ -231,7 +241,7 @@ export default {
   margin: 0;
   padding: 0;
   position: relative;
-  color: #5c2478;
+  color: white;
   text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
 }
 
