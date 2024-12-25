@@ -225,6 +225,7 @@ export default {
   width: 100vw;
   height: 100vh;
   background-size: cover;
+  background-color: #5c2478;
   background-position: center;
   background-repeat: no-repeat;
   margin: 0;
@@ -262,13 +263,13 @@ export default {
 .header h1 .sparkle:nth-child(1) {
   top: 10%;
   left: 20%;
-  animation-delay: 0.2s;
+  animation-delay: 2s;
 }
 
 .header h1 .sparkle:nth-child(2) {
   top: 30%;
   left: 60%;
-  animation-delay: 1s;
+  animation-delay: 3s;
 }
 
 .header h1 .sparkle:nth-child(3) {
@@ -298,13 +299,13 @@ export default {
   header h1 .sparkle:nth-child(2) {
   top: 25%;
   left: 50%;
-  animation-delay: 1s;
+  animation-delay: 3s;
 }
 
   header h1 .sparkle:nth-child(2) {
   top: 38%;
   left: 10%;
-  animation-delay: 0.2s;
+  animation-delay: 0.9s;
 }
 
   header h1 .sparkle:nth-child(2) {
