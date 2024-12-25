@@ -139,7 +139,7 @@ export default {
           const currentTime = new Date().getTime();
           const elapsedMinutes = (currentTime - paymentTimestamp) / (1000 * 60);
 
-          if (elapsedMinutes >= 30) {
+          if (elapsedMinutes >= 0.5) {
             this.hasPaid = false;
             this.timerExpired = true;
             localStorage.removeItem("paymentTimestamp");
