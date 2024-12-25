@@ -5,27 +5,31 @@
         <h1>Virtual Assistant Hub</h1>
         <p>Select an assistant by clicking on a circle below.</p>
       </div>
-      <div class="paywall" v-if="!hasPaid">
+      <div class="paywall" v-if="!hasPaid && showPaywall">
         <p>Unlock full access for just 2 RON!</p>
+        <p>Time expired. Please pay to continue.</p>
         <button @click="handlePayment">Pay Now</button>
+      </div>
+      <div v-if="!showPaywall && !hasPaid" class="timer">
+        <p>Free usage time remaining: {{ remainingTime }} seconds</p>
       </div>
       <div class="circle-container" v-else>
         <div
           v-for="(agent, index) in agents"
           :key="index"
           class="circle"
-          draggable="true"
-          @dragstart="dragStart($event, index)"
-          @dragend="dragEnd($event, index)"
           @click="toggleWidget(index)"
         >
           <img :src="agent.circleImage" alt="Agent Circle" class="circle-image" />
         </div>
-        <div class="widget" v-if="agents.some(agent => agent.visible)" @click.stop>
+      </div>
+
+      <div class="widget-container" v-if="agents.some(agent => agent.visible)">
+        <div class="widget" @click="startTimer">
           <elevenlabs-convai :agent-id="agents.find(agent => agent.visible).id"></elevenlabs-convai>
         </div>
-        <div class="description" v-if="activeDescription">
-          <p>{{ activeDescription }}</p>
+        <div class="description">
+          {{ agents.find(agent => agent.visible).description }}
         </div>
       </div>
     </div>
@@ -44,38 +48,36 @@ export default {
           visible: false,
           background: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp",
           circleImage: "./poza2.png",
-          description:
-            "Claudia este seducția întruchipată - o combinație perfectă de îndrăzneală și eleganță. Vocea ei îți mângâie simțurile, iar spiritul ei glumeț îți aprinde dorința."
+          description: "Claudia este seducția întruchipată - o combinație perfectă de îndrăzneală și eleganță. Vocea ei îți mângâie simțurile, iar spiritul ei glumeț îți aprinde dorința."
         },
         {
           id: "sNEfrsQUklzPW2Hu6VGg",
           visible: false,
           background: "https://i.giphy.com/iIYcg9qJtPn34twSLU.webp",
           circleImage: "./poza3.png",
-          description:
-            "Alexandra este o enigmă fascinantă - cu o voce blândă care îți atinge sufletul și îți aprinde imaginația. Fiecare frază este o invitație către un joc seducător."
+          description: "Alexandra este o enigmă fascinantă - cu o voce blândă care îți atinge sufletul și îți aprinde imaginația. Fiecare frază este o invitație către un joc seducător."
         },
         {
           id: "EU4z5Ma0f0dHLY6m9KSq",
           visible: false,
           background: "https://i.giphy.com/xTg8Bd9jyppDHgvjQQ.webp",
           circleImage: "./poza4.png",
-          description:
-            "Patricia are un farmec irezistibil -  cu o voce care îți șoptește promisiuni subtile și te poartă într-o lume unde totul pare posibil. Jucăușă și fermecătoare."
+          description: "Patricia are un farmec irezistibil - Jucăușă și fermecătoare, își folosește inteligența și căldura pentru a te captiva complet."
         },
         {
           id: "Hd79ohSgVoA9LkZcEhRG",
           visible: false,
           background: "https://i.giphy.com/xULW8LuH8tqB4H0Egg.webp",
           circleImage: "./poza.png",
-          description:
-            "Angela este seducția întruchipată - cu o voce caldă și un aer jucăuș, știe exact cum să te facă să zâmbești și să-ți simți inima bătând mai repede."
+          description: "Angela este seducția întruchipată – cu o voce caldă și un aer jucăuș, știe exact cum să te facă să zâmbești și să-ți simți inima bătând mai repede."
         }
       ],
-      positions: [],
       hasPaid: false,
-      currentBackground: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp", // Fundal implicit
-      activeDescription: null // Descriere activă
+      showPaywall: false,
+      currentBackground: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp",
+      remainingTime: 60,
+      timer: null,
+      timerStarted: false
     };
   },
   methods: {
@@ -91,7 +93,7 @@ export default {
         });
 
         const { id } = await response.json();
-        localStorage.setItem("sessionId", id); // Salvăm `sessionId` în localStorage
+        localStorage.setItem("sessionId", id);
         await stripe.redirectToCheckout({ sessionId: id });
       } catch (error) {
         console.error("Error during payment:", error.message);
@@ -110,38 +112,31 @@ export default {
         );
         const data = await response.json();
 
-        if (data.hasPaid) {
-          this.hasPaid = true;
-        } else {
-          this.hasPaid = false;
-        }
+        this.hasPaid = data.hasPaid;
       } catch (error) {
         console.error("Error checking payment status:", error.message);
       }
     },
     toggleWidget(index) {
       this.agents.forEach((agent, idx) => {
-        if (index === idx) {
-          agent.visible = !agent.visible;
+        agent.visible = idx === index ? !agent.visible : false;
+        if (agent.visible) {
           this.currentBackground = agent.background;
-          this.activeDescription = agent.visible ? agent.description : null;
-        } else {
-          agent.visible = false;
         }
       });
     },
-    dragStart(event, index) {
-      event.dataTransfer.setData("index", index);
-    },
-    dragEnd(event, index) {
-      const container = event.target.parentNode;
-      const rect = container.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-      this.positions[index] = { x, y };
-      event.target.style.position = "absolute";
-      event.target.style.left = `${x}px`;
-      event.target.style.top = `${y}px`;
+    startTimer() {
+      if (!this.timerStarted) {
+        this.timerStarted = true;
+        this.timer = setInterval(() => {
+          if (this.remainingTime > 0) {
+            this.remainingTime--;
+          } else {
+            this.showPaywall = true;
+            clearInterval(this.timer);
+          }
+        }, 1000);
+      }
     }
   },
   mounted() {
@@ -151,8 +146,7 @@ export default {
     script.type = "text/javascript";
     document.body.appendChild(script);
 
-    this.positions = this.agents.map(() => ({ x: 0, y: 0 }));
-    this.checkPaymentStatus(); // Verificăm starea plăți la montarea componentului
+    this.checkPaymentStatus();
   }
 };
 </script>
@@ -168,9 +162,6 @@ export default {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  border: 5px solid black;
-  box-sizing: border-box;
-  overflow: hidden;
   position: relative;
   color: white;
   text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
@@ -211,6 +202,12 @@ export default {
   cursor: pointer;
 }
 
+.timer {
+  margin-top: 10px;
+  color: white;
+  font-size: 1.2rem;
+}
+
 .circle-container {
   position: absolute;
   top: 20%;
@@ -227,7 +224,6 @@ export default {
   border-radius: 50%;
   cursor: pointer;
   background-color: rgba(255, 255, 255, 0.8);
-  animation: float 7s ease-in-out infinite;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -240,6 +236,15 @@ export default {
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
+}
+
+.widget-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  text-align: center;
 }
 
 .widget {
@@ -267,17 +272,5 @@ export default {
   text-align: center; /* Centers the text inside the box */
   white-space: normal; /* Allows the text to wrap */
   line-height: 1.5; /* Improves line spacing for readability */
-}
-
-@keyframes float {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-  100% {
-    transform: translateY(0);
-  }
 }
 </style>
