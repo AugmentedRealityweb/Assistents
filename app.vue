@@ -178,14 +178,17 @@ export default {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  width: 100vw;
+  width: 200vw;
   height: 100vh;
-  background-size: 200%;
+  background-size: cover%;
   background-position: center;
   background-repeat: no-repeat;
   position: relative;
   color: white;
   text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+  html, body {
+  margin: 0;
+  padding: 0;
 }
 
 .header {
