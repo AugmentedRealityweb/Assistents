@@ -6,7 +6,7 @@
         <p>Select an assistant by clicking on a circle below.</p>
       </div>
       <div class="paywall" v-if="!hasPaid && timerExpired">
-        <p>Unlock full access for just 2 RON!</p>
+        <p>Continuă conversația cu doar 30RON</p>
         <button @click="handlePayment">Pay Now</button>
       </div>
       <div class="circle-container" v-else>
