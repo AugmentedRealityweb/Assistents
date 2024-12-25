@@ -74,7 +74,7 @@ export default {
       activeDescription: null,
     };
   },
-  methods: {
+ methods: {
     toggleWidget(index) {
       this.agents.forEach((agent, idx) => {
         agent.visible = idx === index ? !agent.visible : false;
