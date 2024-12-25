@@ -251,21 +251,22 @@ export default {
 }
 
 .description {
-  all: unset; /* Elimină toate stilurile implicite */
-  position: fixed; /* Reaplică stilurile tale */
-  bottom: -20px;
-  left: 50%;
-  transform: translateX(-50%);
+  padding: 10px;
   background: rgba(0, 0, 0, 0.8);
   color: white;
-  padding: 20px;
   border-radius: 8px;
-  font-size: 1rem !important;
-  line-height: 2;
-  text-align: justify;
-  max-width: 90%;
-  white-space: normal;
-  word-wrap: break-word;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  width: 80%; /* Ensures the width spans a good horizontal space */
+  max-width: 900px; /* Restricts the width for readability */
+  margin: 0 auto;
+  font-size: 1.2rem;
+  position: fixed;
+  bottom: 5%; /* Positions the description box at the bottom */
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center; /* Centers the text inside the box */
+  white-space: normal; /* Allows the text to wrap */
+  line-height: 1.5; /* Improves line spacing for readability */
 }
 
 @keyframes float {
