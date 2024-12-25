@@ -2,7 +2,14 @@
   <div id="app">
     <div class="container" :style="{ backgroundImage: `url(${currentBackground})` }">
       <div class="header">
-        <h1>Conversații Fierbinți</h1>
+        <h1>Conversații Fierbinți
+        <span class="sparkle"></span>
+    <span class="sparkle"></span>
+    <span class="sparkle"></span>
+    <span class="sparkle"></span>
+    <span class="sparkle">
+       </span>
+       </h1>
         <p>Selectează un model pentru a începe conversația.</p>
       </div>
       <div class="paywall" v-if="!hasPaid">
