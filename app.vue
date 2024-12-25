@@ -245,7 +245,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 60%);
+  background: radial-gradient(circle, rgba(245, 39, 145, 0.10) 0%, rgba(245, 39, 145, 0.15) 60%);
   opacity: 0;
   animation: sparkle 3s infinite ease-in-out;
   pointer-events: none; /* Luminile nu vor interfera cu textul */
