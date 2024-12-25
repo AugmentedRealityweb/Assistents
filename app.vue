@@ -180,7 +180,7 @@ export default {
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background-size: contain;
+  background-size: 200%;
   background-position: center;
   background-repeat: no-repeat;
   position: relative;
