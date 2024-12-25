@@ -130,49 +130,58 @@ export default {
       }
     },
     validatePaymentTime() {
-      const paymentTimestamp = localStorage.getItem("paymentTimestamp");
-      if (paymentTimestamp) {
-        const currentTime = new Date().getTime();
-        const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
+        const paymentTimestamp = localStorage.getItem("paymentTimestamp");
+        if (paymentTimestamp) {
+            const currentTime = new Date().getTime();
+            const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
 
-        if (elapsedSeconds >= 30) {
-          // Timpul a expirat, paywall-ul trebuie activat
-          this.hasPaid = false;
-          localStorage.removeItem("paymentTimestamp");
-          localStorage.setItem("hasPaid", "false");
+            if (elapsedSeconds >= 30) {
+                // Timpul a expirat, paywall-ul trebuie activat
+                this.hasPaid = false;
+                localStorage.setItem("hasPaid", "false");
+                localStorage.removeItem("paymentTimestamp");
+            } else {
+                // Timpul nu a expirat, utilizatorul are acces
+                this.hasPaid = true;
+                localStorage.setItem("hasPaid", "true");
+            }
         } else {
-          // Timpul nu a expirat, utilizatorul are acces
-          this.hasPaid = true;
-          localStorage.setItem("hasPaid", "true");
+            // Nu există timestamp, paywall-ul trebuie activat
+            this.hasPaid = false;
+            localStorage.setItem("hasPaid", "false");
         }
-      } else {
-        // Nu există timestamp, paywall-ul trebuie activat
-        this.hasPaid = false;
-        localStorage.setItem("hasPaid", "false");
-      }
     },
     validatePaywallOnLoad() {
-      // Validare imediată a stării fără a aștepta intervalul
-      this.validatePaymentTime();
+        // Validare imediată a stării fără a aștepta intervalul
+        const paymentTimestamp = localStorage.getItem("paymentTimestamp");
+        if (paymentTimestamp) {
+            const currentTime = new Date().getTime();
+            const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
 
-      // Setare starea locală pe baza rezultatului validării
-      const hasPaid = localStorage.getItem("hasPaid");
-      if (hasPaid === "true") {
-        this.hasPaid = true;
-      } else {
-        this.hasPaid = false;
-      }
+            if (elapsedSeconds >= 30) {
+                // Timpul a expirat, paywall-ul trebuie activat
+                this.hasPaid = false;
+                localStorage.setItem("hasPaid", "false");
+                localStorage.removeItem("paymentTimestamp");
+            } else {
+                this.hasPaid = true;
+                localStorage.setItem("hasPaid", "true");
+            }
+        } else {
+            this.hasPaid = false;
+            localStorage.setItem("hasPaid", "false");
+        }
 
-      // Pornire timer pentru actualizări continue
-      this.startPaywallTimer();
+        // Pornire timer pentru verificări continue
+        this.startPaywallTimer();
     },
     startPaywallTimer() {
-      if (this.timerId) {
-        clearInterval(this.timerId);
-      }
-      this.timerId = setInterval(() => {
-        this.validatePaymentTime();
-      }, 1000); // Verificare la fiecare secundă
+        if (this.timerId) {
+            clearInterval(this.timerId);
+        }
+        this.timerId = setInterval(() => {
+            this.validatePaymentTime();
+        }, 1000); // Verificare la fiecare secundă
     }
 },
 mounted() {
@@ -183,9 +192,7 @@ mounted() {
     document.body.appendChild(script);
 
     // Inițializare completă
-    Promise.all([this.checkPaymentStatus(), this.validatePaywallOnLoad()])
-      .then(() => console.log("Initialization complete."))
-      .catch(error => console.error("Error during initialization:", error));
+    this.validatePaywallOnLoad();
 }
 };
 </script>
