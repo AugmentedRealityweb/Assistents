@@ -263,7 +263,7 @@ export default {
   font-size: 3rem !important;
   line-height: 1.5;
   text-align: justify;
-  max-width: 70%;
+  max-width: 80%;
   white-space: normal;
   word-wrap: break-word;
 }
