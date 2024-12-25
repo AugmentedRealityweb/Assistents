@@ -186,9 +186,6 @@ export default {
   position: relative;
   color: white;
   text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
-  html, body {
-  margin: 0;
-  padding: 0;
 }
 
 .header {
