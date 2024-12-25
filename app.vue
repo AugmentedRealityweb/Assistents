@@ -130,8 +130,10 @@ export default {
       const paymentTimestamp = localStorage.getItem("paymentTimestamp");
       if (paymentTimestamp) {
         const currentTime = new Date().getTime();
-        const elapsedMinutes = (currentTime - paymentTimestamp) / (1000 * 60);
-        if (elapsedMinutes >= 0.5) {
+        const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
+
+        if (elapsedSeconds >= 30) {
+          // Reset paywall after 30 seconds
           this.hasPaid = false;
           localStorage.removeItem("paymentTimestamp");
         } else {
@@ -143,6 +145,12 @@ export default {
     },
     validatePaywallOnLoad() {
       this.validatePaymentTime();
+      this.startPaywallTimer();
+    },
+    startPaywallTimer() {
+      setInterval(() => {
+        this.validatePaymentTime();
+      }, 1000); // Check every second to update the paywall state
     }
   },
   mounted() {
@@ -155,6 +163,7 @@ export default {
     this.validatePaywallOnLoad();
     this.checkPaymentStatus();
   }
+}
 };
 </script>
 
