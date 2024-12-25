@@ -23,7 +23,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
             product_data: {
               name: "Access Fee",
             },
-            unit_amount: 200, // 1 RON în bani
+            unit_amount: 3000, // 30 RON în bani
           },
           quantity: 1,
         },
