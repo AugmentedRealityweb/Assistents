@@ -2,7 +2,7 @@
   <div id="app">
     <div class="container" :style="{ backgroundImage: `url(${currentBackground})` }">
       <div class="header">
-        <h1>Conversții Fierbinți și Profunde</h1>
+        <h1>Conversții Fierbinți</h1>
         <p>Selectează un model pentru a începe conversația.</p>
       </div>
       <div class="paywall" v-if="!hasPaid && timerExpired">
@@ -137,6 +137,11 @@ export default {
     },
     startTimer() {
       if (!this.timerVisible && !this.timerExpired) {
+        if (localStorage.getItem("timerExpired")) {
+          this.timerExpired = true;
+          this.timerVisible = false;
+          return;
+        }
         this.timerVisible = true;
         this.timerInterval = setInterval(() => {
           if (this.timer > 0) {
@@ -145,6 +150,7 @@ export default {
             clearInterval(this.timerInterval);
             this.timerExpired = true;
             this.timerVisible = false;
+            localStorage.setItem("timerExpired", "true");
           }
         }, 1000);
       }
@@ -158,6 +164,10 @@ export default {
     document.body.appendChild(script);
 
     this.checkPaymentStatus();
+
+    if (localStorage.getItem("timerExpired")) {
+      this.timerExpired = true;
+    }
   }
 };
 </script>
@@ -186,6 +196,7 @@ export default {
 .header h1 {
   font-size: 2.5rem;
   margin: 0;
+  color: rgba(247, 0, 44, 0.8)
 }
 
 .header p {
