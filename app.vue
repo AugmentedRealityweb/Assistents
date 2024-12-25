@@ -45,7 +45,7 @@ export default {
           background: "https://i.giphy.com/l4FGE5EZOqikBWaqc.webp",
           circleImage: "./poza2.png",
           description:
-            "Claudia este seducția întruchipată - o combinație perfectă de îndrăzneală și eleganță. Vocea ei îți mângâie simțurile, iar spiritul ei glumeț îți aprinde dorința de a o cunoaște."
+            "Claudia este seducția întruchipată - o combinație perfectă de îndrăzneală și eleganță. Vocea ei îți mângâie simțurile, iar spiritul ei glumeț îți aprinde dorința."
         },
         {
           id: "sNEfrsQUklzPW2Hu6VGg",
@@ -245,16 +245,16 @@ export default {
 .widget {
   position: fixed;
   top: 50%;
-  left: 90%;
+  left: 91%;
   transform: translate(-50%, -50%);
   z-index: 1000;
 }
 
 .description {
   padding: 10px;
-  background: rgba(211, 199, 205, 0.56);
+  background: rgba(224, 200, 205, 0.57);
   color: white;
-  border-radius: 20px;
+  border-radius: 25px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   width: 80%; /* Ensures the width spans a good horizontal space */
   max-width: 900px; /* Restricts the width for readability */
