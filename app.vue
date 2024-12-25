@@ -75,6 +75,15 @@ export default {
     };
   },
   methods: {
+    toggleWidget(index) {
+      this.agents.forEach((agent, idx) => {
+        agent.visible = idx === index ? !agent.visible : false;
+        if (agent.visible) {
+          this.currentBackground = agent.background;
+          this.activeDescription = agent.description;
+        }
+      });
+    },
     async handlePayment() {
       const stripe = await loadStripe(
         "pk_live_51LhHVFJOzg3eyu5LJRnplRv2AKh0MGJEew4HhNbn3Eu2LfJkbZUv2j4lFNxulY5ugbb6wrh07QCaX0djdFnQ8f7A00tyuYKXEL"
