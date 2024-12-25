@@ -88,7 +88,7 @@ export default {
       return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
     }
   },
-  methods: {
+     methods: {
     async handlePayment() {
       const stripe = await loadStripe(
         "pk_live_51LhHVFJOzg3eyu5LJRnplRv2AKh0MGJEew4HhNbn3Eu2LfJkbZUv2j4lFNxulY5ugbb6wrh07QCaX0djdFnQ8f7A00tyuYKXEL"
@@ -103,8 +103,28 @@ export default {
         const { id } = await response.json();
         localStorage.setItem("sessionId", id);
         await stripe.redirectToCheckout({ sessionId: id });
+
+        // Salvează timestamp-ul plății în localStorage
+        const paymentTimestamp = new Date().getTime();
+        localStorage.setItem("paymentTimestamp", paymentTimestamp);
+        this.hasPaid = true;
       } catch (error) {
         console.error("Error during payment:", error.message);
+      }
+    },
+    checkPaymentStatusOnLoad() {
+      const paymentTimestamp = localStorage.getItem("paymentTimestamp");
+
+      if (paymentTimestamp) {
+        const currentTime = new Date().getTime();
+        const elapsedMinutes = (currentTime - paymentTimestamp) / (1000 * 60);
+
+        if (elapsedMinutes >= 30) {
+          this.hasPaid = false;
+          localStorage.removeItem("paymentTimestamp");
+        } else {
+          this.hasPaid = true;
+        }
       }
     },
     async checkPaymentStatus() {
@@ -120,39 +140,13 @@ export default {
         );
         const data = await response.json();
 
-        this.hasPaid = data.hasPaid;
+        if (data.hasPaid) {
+          this.hasPaid = true;
+        } else {
+          this.hasPaid = false;
+        }
       } catch (error) {
         console.error("Error checking payment status:", error.message);
-      }
-    },
-    toggleWidget(index) {
-      this.agents.forEach((agent, idx) => {
-        agent.visible = idx === index ? !agent.visible : false;
-        if (agent.visible) {
-          this.currentBackground = agent.background;
-          this.activeDescription = agent.description;
-        }
-      });
-      this.startTimer();
-    },
-    startTimer() {
-      if (!this.timerVisible && !this.timerExpired) {
-        if (localStorage.getItem("timerExpired")) {
-          this.timerExpired = true;
-          this.timerVisible = false;
-          return;
-        }
-        this.timerVisible = true;
-        this.timerInterval = setInterval(() => {
-          if (this.timer > 0) {
-            this.timer--;
-          } else {
-            clearInterval(this.timerInterval);
-            this.timerExpired = true;
-            this.timerVisible = false;
-            localStorage.setItem("timerExpired", "true");
-          }
-        }, 1000);
       }
     }
   },
@@ -163,7 +157,7 @@ export default {
     script.type = "text/javascript";
     document.body.appendChild(script);
 
-    this.checkPaymentStatus();
+    this.checkPaymentStatusOnLoad();
 
     if (localStorage.getItem("timerExpired")) {
       this.timerExpired = true;
@@ -178,8 +172,9 @@ export default {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  width: 105vw;
-  height: 105vh;
+  width: 100vw;
+  height: 100vh;
+  left: 50%;
   background-size: cover; /* Asigură că imaginea acoperă întregul ecran */
   background-position: center; /* Centrarea imaginii */
   background-repeat: no-repeat; /* Evită repetarea imaginii */
