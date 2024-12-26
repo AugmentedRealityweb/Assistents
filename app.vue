@@ -5,10 +5,14 @@
         <h1>Conversații Fierbinți</h1>
         <p>Selectează un model pentru a începe conversația.</p>
       </div>
-      <div class="paywall" v-if="!hasPaid">
+
+      <!-- Paywall: Apare DOAR dacă timpul gratuit a expirat și nu s-a plătit -->
+      <div class="paywall" v-if="showPaywall">
         <p>Continuă conversația cu doar 30RON</p>
         <button @click="handlePayment">Pay Now</button>
       </div>
+
+      <!-- Container cu "cercurile" agenților -->
       <div class="circle-container" v-else>
         <div
           v-for="(agent, index) in agents"
@@ -18,13 +22,19 @@
         >
           <img :src="agent.circleImage" alt="Agent Circle" class="circle-image" />
         </div>
+
+        <!-- Widget ElevenLabs (apare doar pentru agentul vizibil) -->
         <div class="widget" v-if="agents.some(agent => agent.visible)" @click.stop>
           <elevenlabs-convai :agent-id="agents.find(agent => agent.visible).id"></elevenlabs-convai>
         </div>
+
+        <!-- Descriere agent selectat -->
         <div class="description" v-if="activeDescription">
           <p>{{ activeDescription }}</p>
         </div>
       </div>
+
+      <!-- Mesaj care afișează timpul gratuit rămas, doar dacă mai există timp gratuit disponibil -->
       <div v-if="freeAccessTimeLeft > 0" class="free-access-message">
         Free access for {{ freeAccessTimeLeft }} seconds
       </div>
@@ -82,6 +92,7 @@ export default {
     };
   },
   methods: {
+    // Afișează/ascunde widgetul agentului selectat și schimbă background + descriere
     toggleWidget(index) {
       this.agents.forEach((agent, idx) => {
         agent.visible = idx === index ? !agent.visible : false;
@@ -91,6 +102,8 @@ export default {
         }
       });
     },
+
+    // Inițierea plații folosind Stripe
     async handlePayment() {
       const stripe = await loadStripe(
         "pk_live_51LhHVFJOzg3eyu5LJRnplRv2AKh0MGJEew4HhNbn3Eu2LfJkbZUv2j4lFNxulY5ugbb6wrh07QCaX0djdFnQ8f7A00tyuYKXEL"
@@ -104,22 +117,32 @@ export default {
 
         const { id } = await response.json();
         if (!id) throw new Error("Session ID not received.");
+
+        // Salvăm ID-ul în localStorage pentru a verifica ulterior statusul plății
         localStorage.setItem("sessionId", id);
+
+        // Redirecționăm către pagina de checkout
         await stripe.redirectToCheckout({ sessionId: id });
       } catch (error) {
         console.error("Error during payment:", error.message);
       }
     },
+
+    // Marchează dacă utilizatorul a folosit deja accesul gratuit
     initializeFreeAccess() {
       if (!localStorage.getItem("freeAccessUsed")) {
+        // Dacă nu există cheie, setăm că nu a fost folosit încă
         localStorage.setItem("freeAccessUsed", "false");
+        // Timpul la care a început accesul gratuit
         localStorage.setItem("freeAccessTimestamp", Date.now());
       }
     },
+
+    // Verifică dacă accesul gratuit a expirat
     validateFreeAccess() {
       const freeAccessUsed = localStorage.getItem("freeAccessUsed");
       if (freeAccessUsed === "true") {
-        this.freeAccessActive = false; // Acces gratuit utilizat deja
+        this.freeAccessActive = false;
         this.freeAccessTimeLeft = 0;
         return;
       }
@@ -127,15 +150,19 @@ export default {
       const freeAccessTimestamp = localStorage.getItem("freeAccessTimestamp");
       const elapsedSeconds = (Date.now() - freeAccessTimestamp) / 1000;
 
+      // Dacă au trecut 60 de secunde, marchem accesul gratuit ca folosit
       if (elapsedSeconds >= 60) {
         localStorage.setItem("freeAccessUsed", "true");
-        this.freeAccessActive = false; // Oprire acces gratuit
+        this.freeAccessActive = false; 
         this.freeAccessTimeLeft = 0;
       } else {
+        // Actualizăm timpul gratuit rămas
         this.freeAccessTimeLeft = 60 - Math.floor(elapsedSeconds);
         this.freeAccessActive = true;
       }
     },
+
+    // Verifică statusul plății pe baza sessionId stocat în localStorage
     async checkPaymentStatus() {
       const sessionId = localStorage.getItem("sessionId");
       if (!sessionId) {
@@ -150,6 +177,7 @@ export default {
 
         if (data.hasPaid) {
           this.hasPaid = true;
+          // Dacă plata este confirmată și nu s-a salvat timestampul, îl salvăm acum
           if (!localStorage.getItem("paymentTimestamp")) {
             localStorage.setItem("paymentTimestamp", Date.now());
           }
@@ -161,6 +189,8 @@ export default {
         console.error("Error checking payment status:", error.message);
       }
     },
+
+    // Verifică dacă timpul plătit (5 minute = 300 secunde) a expirat
     validatePaidAccess() {
       const paymentTimestamp = localStorage.getItem("paymentTimestamp");
       if (!paymentTimestamp) {
@@ -171,26 +201,37 @@ export default {
 
       const elapsedSeconds = (Date.now() - paymentTimestamp) / 1000;
 
-      if (elapsedSeconds >= 300) { // 5 minute acces plătit
+      // Dacă au trecut 300 de secunde (5 minute) de la plata anterioară, accesul plătit expiră
+      if (elapsedSeconds >= 300) {
         this.hasPaid = false;
         localStorage.removeItem("paymentTimestamp");
         this.paidAccessTimeLeft = 0;
       } else {
+        // Calculăm timpul plătit rămas
         this.paidAccessTimeLeft = 300 - Math.floor(elapsedSeconds);
       }
     },
+
+    // Inițierea validărilor la încărcarea paginii
     validatePaywallOnLoad() {
+      // Inițializăm starea accesului gratuit (o singură dată per utilizator)
       this.initializeFreeAccess();
+
+      // Verificăm dacă accesul gratuit este încă valabil
       this.validateFreeAccess();
 
+      // Dacă accesul gratuit a expirat, verificăm plata
       if (!this.freeAccessActive) {
-        // Validăm plata doar dacă accesul gratuit a expirat
         this.checkPaymentStatus().then(() => {
           this.validatePaidAccess();
         });
       }
+
+      // Pornim un timer care validează permanent starea paywall-ului
       this.startPaywallTimer();
     },
+
+    // Timerul care face actualizări la fiecare secundă
     startPaywallTimer() {
       if (this.timerId) clearInterval(this.timerId);
 
@@ -203,18 +244,20 @@ export default {
     }
   },
   computed: {
+    // Paywall-ul apare doar după expirarea timpului gratuit și dacă nu există acces plătit
     showPaywall() {
-      // Paywall apare doar după expirarea timpului gratuit
       return !this.freeAccessActive && !this.hasPaid;
     }
   },
   mounted() {
+    // Încărcăm scriptul pentru ElevenLabs
     const script = document.createElement("script");
     script.src = "https://elevenlabs.io/convai-widget/index.js";
     script.async = true;
     script.type = "text/javascript";
     document.body.appendChild(script);
 
+    // Facem validările și pornim timerul
     this.validatePaywallOnLoad();
   }
 };
