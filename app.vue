@@ -75,13 +75,6 @@ export default {
       hasPaid: false,
       currentBackground: "https://i.giphy.com/fygfeYhDOPrhTOHZ7v.webp",
       activeDescription: null,
-      freeAccessTimeLeft: 60,
-      timerId: null
-    };
-  },
-  hasPaid: false,
-      currentBackground: "https://i.giphy.com/fygfeYhDOPrhTOHZ7v.webp",
-      activeDescription: null,
       freeAccessTimeLeft: 0,
       paidAccessTimeLeft: 0,
       timerId: null
@@ -210,6 +203,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .container {
