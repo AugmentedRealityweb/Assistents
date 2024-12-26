@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div class="container" :style="{ backgroundImage: `url(${currentBackground})` }">
+    <div class="container" :style="{ backgroundImage: url(${currentBackground}) }">
       <div class="header">
         <h1>Conversații Fierbinți
         <span class="sparkle"></span>
@@ -128,7 +128,7 @@ export default {
           return;
         }
 
-        const response = await fetch(`/api/check-payment-status?sessionId=${sessionId}`);
+        const response = await fetch(/api/check-payment-status?sessionId=${sessionId});
         const data = await response.json();
 
         if (data.hasPaid) {
@@ -158,9 +158,9 @@ export default {
         const currentTime = new Date().getTime();
         const elapsedSeconds = (currentTime - freeAccessTimestamp) / 1000;
 
-        this.freeAccessTimeLeft = Math.max(60 - Math.floor(elapsedSeconds), 0);
+        this.freeAccessTimeLeft = Math.max(10 - Math.floor(elapsedSeconds), 0);
 
-        if (elapsedSeconds >= 60) {
+        if (elapsedSeconds >= 10) {
           this.hasPaid = false;
           localStorage.setItem("hasPaid", "false");
         } else {
@@ -173,23 +173,23 @@ export default {
       }
     },
     validatePaymentTime() {
-  const paymentTimestamp = localStorage.getItem("paymentTimestamp");
-  if (paymentTimestamp) {
-    const currentTime = new Date().getTime();
-    const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
+      const paymentTimestamp = localStorage.getItem("paymentTimestamp");
+      if (paymentTimestamp) {
+        const currentTime = new Date().getTime();
+        const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
 
-    if (elapsedSeconds >= 60) {
-      this.hasPaid = false;
-      localStorage.setItem("hasPaid", "false");
-      localStorage.removeItem("paymentTimestamp");
-    } else {
-      this.hasPaid = true; // Plata are prioritate
-      localStorage.setItem("hasPaid", "true");
-    }
-  } else if (!this.hasPaid) {
-    this.validateFreeAccess();
-  }
-},
+        if (elapsedSeconds >= 60) {
+          this.hasPaid = false;
+          localStorage.setItem("hasPaid", "false");
+          localStorage.removeItem("paymentTimestamp");
+        } else {
+          this.hasPaid = true;
+          localStorage.setItem("hasPaid", "true");
+        }
+      } else {
+        this.validateFreeAccess();
+      }
+    },
     validatePaywallOnLoad() {
       this.initializeFreeAccess();
       this.validatePaymentTime();
@@ -217,27 +217,21 @@ export default {
 </script>
 
 <style scoped>
-  {
-  box-sizing: border-box;
-}
-
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-}
 .container {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
-  height: 100%;;
-  background-size: cover; /* Fundalul să acopere complet */
-  background-position: center; /* Fundalul centrat */
-  background-repeat: no-repeat; /* Fără repetare */
-  background-color: #5c2478; /* Fundal fallback */
+  width: 100vw;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  color: white;
+  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
 }
 
 .header {
@@ -268,13 +262,13 @@ html, body {
 .header h1 .sparkle:nth-child(1) {
   top: 10%;
   left: 20%;
-  animation-delay: 2s;
+  animation-delay: 0.2s;
 }
 
 .header h1 .sparkle:nth-child(2) {
   top: 30%;
   left: 60%;
-  animation-delay: 3s;
+  animation-delay: 1s;
 }
 
 .header h1 .sparkle:nth-child(3) {
@@ -304,13 +298,13 @@ html, body {
   header h1 .sparkle:nth-child(2) {
   top: 25%;
   left: 50%;
-  animation-delay: 3s;
+  animation-delay: 1s;
 }
 
   header h1 .sparkle:nth-child(2) {
   top: 38%;
   left: 10%;
-  animation-delay: 0.9s;
+  animation-delay: 0.2s;
 }
 
   header h1 .sparkle:nth-child(2) {
