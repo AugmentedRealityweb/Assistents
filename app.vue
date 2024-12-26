@@ -58,7 +58,7 @@ export default {
         {
           id: "EU4z5Ma0f0dHLY6m9KSq",
           visible: false,
-          background: "https://i.giphy.com/NzavBMIQ3CGxtMlOcv.webp",
+          background: "https://i.giphy.com/tY3S7GJlVOyhO0TOid.webp",
           circleImage: "./poza4.png",
           description:
             "Patricia are un farmec irezistibil -  cu o voce care îți șoptește promisiuni subtile și te poartă într-o lume unde totul pare posibil. Jucăușă și fermecătoare."
@@ -73,11 +73,11 @@ export default {
         }
       ],
       hasPaid: false,
-      freeAccessActive: true, // Controlăm vizibilitatea paywall-ului în timpul gratuit
+      freeAccessActive: true, // Controlează dacă timpul gratuit este activ
       currentBackground: "https://i.giphy.com/fygfeYhDOPrhTOHZ7v.webp",
       activeDescription: null,
-      freeAccessTimeLeft: 60,
-      paidAccessTimeLeft: 0,
+      freeAccessTimeLeft: 60, // Timp gratuit (60 secunde)
+      paidAccessTimeLeft: 0, // Timp plătit (în secunde)
       timerId: null
     };
   },
@@ -119,7 +119,7 @@ export default {
     validateFreeAccess() {
       const freeAccessUsed = localStorage.getItem("freeAccessUsed");
       if (freeAccessUsed === "true") {
-        this.freeAccessActive = false;
+        this.freeAccessActive = false; // Acces gratuit utilizat deja
         this.freeAccessTimeLeft = 0;
         return;
       }
@@ -127,12 +127,12 @@ export default {
       const freeAccessTimestamp = localStorage.getItem("freeAccessTimestamp");
       const elapsedSeconds = (Date.now() - freeAccessTimestamp) / 1000;
 
-      if (elapsedSeconds >= 20) {
+      if (elapsedSeconds >= 60) {
         localStorage.setItem("freeAccessUsed", "true");
-        this.freeAccessActive = false;
+        this.freeAccessActive = false; // Oprire acces gratuit
         this.freeAccessTimeLeft = 0;
       } else {
-        this.freeAccessTimeLeft = 20 - Math.floor(elapsedSeconds);
+        this.freeAccessTimeLeft = 60 - Math.floor(elapsedSeconds);
         this.freeAccessActive = true;
       }
     },
@@ -171,18 +171,20 @@ export default {
 
       const elapsedSeconds = (Date.now() - paymentTimestamp) / 1000;
 
-      if (elapsedSeconds >= 70) { // 5 minute acces plătit
+      if (elapsedSeconds >= 300) { // 5 minute acces plătit
         this.hasPaid = false;
         localStorage.removeItem("paymentTimestamp");
         this.paidAccessTimeLeft = 0;
       } else {
-        this.paidAccessTimeLeft = 70 - Math.floor(elapsedSeconds);
+        this.paidAccessTimeLeft = 300 - Math.floor(elapsedSeconds);
       }
     },
     validatePaywallOnLoad() {
       this.initializeFreeAccess();
       this.validateFreeAccess();
+
       if (!this.freeAccessActive) {
+        // Validăm plata doar dacă accesul gratuit a expirat
         this.checkPaymentStatus().then(() => {
           this.validatePaidAccess();
         });
