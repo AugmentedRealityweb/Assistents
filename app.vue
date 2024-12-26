@@ -215,7 +215,7 @@ export default {
 
     this.validatePaywallOnLoad();
   }
-};
+}
 </script>
 
 <style scoped>
