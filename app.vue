@@ -63,10 +63,10 @@ export default {
           background: "https://i.giphy.com/1qQ5lOKrgpai8EWGlo.webp",
           circleImage: "./poza3.png",
           description:
-            "Alexandra este o enigmă fascinantă - cu o voce blândă care îți atinge sufletul și îți aprinde imaginația. Fiecare frază este o invitație către un joc seducător."
+            "Delia este o enigmă fascinantă - cu o voce blândă care îți atinge sufletul și îți aprinde imaginația. Fiecare frază este o invitație către un joc seducător."
         },
         {
-          id: "EU4z5Ma0f0dHLY6m9KSq",
+          id: "https://i.giphy.com/NzavBMIQ3CGxtMlOcv.webp",
           visible: false,
           background: "https://i.giphy.com/tY3S7GJlVOyhO0TOid.webp",
           circleImage: "./poza4.png",
@@ -86,7 +86,7 @@ export default {
       freeAccessActive: true, // Controlează dacă timpul gratuit este activ
       currentBackground: "https://i.giphy.com/fygfeYhDOPrhTOHZ7v.webp",
       activeDescription: null,
-      freeAccessTimeLeft: 60, // Timp gratuit (60 secunde)
+      freeAccessTimeLeft: 30, // Timp gratuit (60 secunde)
       paidAccessTimeLeft: 0, // Timp plătit (în secunde)
       timerId: null
     };
@@ -151,13 +151,13 @@ export default {
       const elapsedSeconds = (Date.now() - freeAccessTimestamp) / 1000;
 
       // Dacă au trecut 60 de secunde, marchem accesul gratuit ca folosit
-      if (elapsedSeconds >= 60) {
+      if (elapsedSeconds >= 30) {
         localStorage.setItem("freeAccessUsed", "true");
         this.freeAccessActive = false; 
         this.freeAccessTimeLeft = 0;
       } else {
         // Actualizăm timpul gratuit rămas
-        this.freeAccessTimeLeft = 60 - Math.floor(elapsedSeconds);
+        this.freeAccessTimeLeft = 30 - Math.floor(elapsedSeconds);
         this.freeAccessActive = true;
       }
     },
@@ -202,13 +202,13 @@ export default {
       const elapsedSeconds = (Date.now() - paymentTimestamp) / 1000;
 
       // Dacă au trecut 300 de secunde (5 minute) de la plata anterioară, accesul plătit expiră
-      if (elapsedSeconds >= 300) {
+      if (elapsedSeconds >= 40) {
         this.hasPaid = false;
         localStorage.removeItem("paymentTimestamp");
         this.paidAccessTimeLeft = 0;
       } else {
         // Calculăm timpul plătit rămas
-        this.paidAccessTimeLeft = 300 - Math.floor(elapsedSeconds);
+        this.paidAccessTimeLeft = 40 - Math.floor(elapsedSeconds);
       }
     },
 
