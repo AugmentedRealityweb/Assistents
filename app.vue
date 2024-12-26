@@ -128,52 +128,72 @@ export default {
       }
     }
   },
-  validatePaymentTime() {
-    const paymentTimestamp = localStorage.getItem("paymentTimestamp");
-    if (paymentTimestamp) {
-      const currentTime = new Date().getTime();
-      const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
+  methods: {
+    validatePaymentTime() {
+        const paymentTimestamp = localStorage.getItem("paymentTimestamp");
+        if (paymentTimestamp) {
+            const currentTime = new Date().getTime();
+            const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
 
-      if (elapsedSeconds >= 60) {
-        this.hasPaid = false;
-        localStorage.setItem("hasPaid", "false");
-        localStorage.removeItem("paymentTimestamp");
-      } else {
-        this.hasPaid = true;
-        localStorage.setItem("hasPaid", "true");
-      }
-    } else {
-      this.validateFreeAccess();
-    }
-  },
-  validatePaywallOnLoad() {
-    this.initializeFreeAccess(); // Apel corect către metoda adăugată
-    this.validatePaymentTime();
-    this.startPaywallTimer();
+            if (elapsedSeconds >= 30) {
+                // Timpul a expirat, paywall-ul trebuie activat
+                this.hasPaid = false;
+                localStorage.setItem("hasPaid", "false");
+                localStorage.removeItem("paymentTimestamp");
+            } else {
+                // Timpul nu a expirat, utilizatorul are acces
+                this.hasPaid = true;
+                localStorage.setItem("hasPaid", "true");
+            }
+        } else {
+            // Nu există timestamp, paywall-ul trebuie activat
+            this.hasPaid = false;
+            localStorage.setItem("hasPaid", "false");
+        }
+    },
+    validatePaywallOnLoad() {
+        // Validare imediată a stării fără a aștepta intervalul
+        const paymentTimestamp = localStorage.getItem("paymentTimestamp");
+        if (paymentTimestamp) {
+            const currentTime = new Date().getTime();
+            const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
 
-    const hasPaidFromStorage = localStorage.getItem("hasPaid") === "true";
-    if (hasPaidFromStorage !== this.hasPaid) {
-      this.hasPaid = hasPaidFromStorage;
+            if (elapsedSeconds >= 30) {
+                // Timpul a expirat, paywall-ul trebuie activat
+                this.hasPaid = false;
+                localStorage.setItem("hasPaid", "false");
+                localStorage.removeItem("paymentTimestamp");
+            } else {
+                this.hasPaid = true;
+                localStorage.setItem("hasPaid", "true");
+            }
+        } else {
+            this.hasPaid = false;
+            localStorage.setItem("hasPaid", "false");
+        }
+
+        // Pornire timer pentru verificări continue
+        this.startPaywallTimer();
+    },
+    startPaywallTimer() {
+        if (this.timerId) {
+            clearInterval(this.timerId);
+        }
+        this.timerId = setInterval(() => {
+            this.validatePaymentTime();
+        }, 1000); // Verificare la fiecare secundă
     }
-  },
-  startPaywallTimer() {
-    if (this.timerId) {
-      clearInterval(this.timerId);
-    }
-    this.timerId = setInterval(() => {
-      this.validatePaymentTime();
-    }, 1000);
-  },
 },
-  mounted() {
+mounted() {
     const script = document.createElement("script");
     script.src = "https://elevenlabs.io/convai-widget/index.js";
     script.async = true;
     script.type = "text/javascript";
     document.body.appendChild(script);
 
+    // Inițializare completă
     this.validatePaywallOnLoad();
-  }
+}
 };
 </script>
 
