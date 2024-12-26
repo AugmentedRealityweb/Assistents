@@ -79,6 +79,14 @@ export default {
       timerId: null
     };
   },
+  hasPaid: false,
+      currentBackground: "https://i.giphy.com/fygfeYhDOPrhTOHZ7v.webp",
+      activeDescription: null,
+      freeAccessTimeLeft: 0,
+      paidAccessTimeLeft: 0,
+      timerId: null
+    };
+  },
   methods: {
     toggleWidget(index) {
       this.agents.forEach((agent, idx) => {
@@ -108,41 +116,10 @@ export default {
         console.error("Error during payment:", error.message);
       }
     },
-    async checkPaymentStatus() {
-      try {
-        const sessionId = localStorage.getItem("sessionId");
-        if (!sessionId) {
-          console.error("Session ID is missing.");
-          this.hasPaid = false;
-          return;
-        }
-
-        const response = await fetch(`/api/check-payment-status?sessionId=${sessionId}`);
-        const data = await response.json();
-
-        if (data.hasPaid) {
-          this.hasPaid = true;
-          const paymentTimestamp = new Date().getTime();
-          localStorage.setItem("paymentTimestamp", paymentTimestamp);
-          localStorage.setItem("hasPaid", "true");
-          this.freeAccessTimeLeft = 0; // Dezactivăm accesul gratuit
-        } else {
-          this.hasPaid = false;
-          localStorage.setItem("hasPaid", "false");
-          localStorage.removeItem("sessionId");
-        }
-      } catch (error) {
-        console.error("Error checking payment status:", error.message);
-        this.hasPaid = false;
-        localStorage.setItem("hasPaid", "false");
-      }
-    },
     initializeFreeAccess() {
-      const freeAccessUsed = localStorage.getItem("freeAccessUsed");
-      if (!freeAccessUsed) {
-        const currentTime = new Date().getTime();
-        localStorage.setItem("freeAccessTimestamp", currentTime);
+      if (!localStorage.getItem("freeAccessUsed")) {
         localStorage.setItem("freeAccessUsed", "false");
+        localStorage.setItem("freeAccessTimestamp", Date.now());
       }
     },
     validateFreeAccess() {
@@ -153,62 +130,72 @@ export default {
       }
 
       const freeAccessTimestamp = localStorage.getItem("freeAccessTimestamp");
-      if (freeAccessTimestamp) {
-        const currentTime = new Date().getTime();
-        const elapsedSeconds = (currentTime - freeAccessTimestamp) / 1000;
+      const elapsedSeconds = (Date.now() - freeAccessTimestamp) / 1000;
 
-        this.freeAccessTimeLeft = Math.max(60 - Math.floor(elapsedSeconds), 0);
-
-        if (elapsedSeconds >= 60) {
-          this.hasPaid = false;
-          localStorage.setItem("freeAccessUsed", "true");
-          localStorage.setItem("hasPaid", "false");
-        } else {
-          this.hasPaid = true;
-          localStorage.setItem("hasPaid", "true");
-        }
+      if (elapsedSeconds >= 60) {
+        localStorage.setItem("freeAccessUsed", "true");
+        this.freeAccessTimeLeft = 0;
       } else {
-        this.hasPaid = false;
-        localStorage.setItem("hasPaid", "false");
+        this.freeAccessTimeLeft = 60 - Math.floor(elapsedSeconds);
       }
     },
-    validatePaymentTime() {
-      const paymentTimestamp = localStorage.getItem("paymentTimestamp");
-      if (paymentTimestamp) {
-        const currentTime = new Date().getTime();
-        const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
+    async checkPaymentStatus() {
+      const sessionId = localStorage.getItem("sessionId");
+      if (!sessionId) {
+        this.hasPaid = false;
+        this.paidAccessTimeLeft = 0;
+        return;
+      }
 
-        if (elapsedSeconds >= 30) {
-          this.hasPaid = false;
-          localStorage.setItem("hasPaid", "false");
-          localStorage.removeItem("paymentTimestamp");
-        } else {
+      try {
+        const response = await fetch(`/api/check-payment-status?sessionId=${sessionId}`);
+        const data = await response.json();
+
+        if (data.hasPaid) {
           this.hasPaid = true;
-          localStorage.setItem("hasPaid", "true");
+          if (!localStorage.getItem("paymentTimestamp")) {
+            localStorage.setItem("paymentTimestamp", Date.now());
+          }
+        } else {
+          this.hasPaid = false;
+          this.paidAccessTimeLeft = 0;
         }
+      } catch (error) {
+        console.error("Error checking payment status:", error.message);
+      }
+    },
+    validatePaidAccess() {
+      const paymentTimestamp = localStorage.getItem("paymentTimestamp");
+      if (!paymentTimestamp) {
+        this.hasPaid = false;
+        this.paidAccessTimeLeft = 0;
+        return;
+      }
+
+      const elapsedSeconds = (Date.now() - paymentTimestamp) / 1000;
+
+      if (elapsedSeconds >= 300) { // 5 minute acces plătit
+        this.hasPaid = false;
+        localStorage.removeItem("paymentTimestamp");
+        this.paidAccessTimeLeft = 0;
       } else {
-        this.validateFreeAccess();
+        this.paidAccessTimeLeft = 300 - Math.floor(elapsedSeconds);
       }
     },
     validatePaywallOnLoad() {
       this.initializeFreeAccess();
-      this.checkPaymentStatus()
-        .then(() => {
-          this.validatePaymentTime();
-        })
-        .catch((error) => {
-          console.error("Error during payment status check:", error.message);
-          this.hasPaid = false;
-        });
+      this.validateFreeAccess();
+      this.checkPaymentStatus().then(() => {
+        this.validatePaidAccess();
+      });
       this.startPaywallTimer();
     },
     startPaywallTimer() {
-      if (this.timerId) {
-        clearInterval(this.timerId);
-      }
+      if (this.timerId) clearInterval(this.timerId);
+
       this.timerId = setInterval(() => {
         this.validateFreeAccess();
-        this.validatePaymentTime();
+        this.validatePaidAccess();
       }, 1000);
     }
   },
