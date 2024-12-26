@@ -97,12 +97,18 @@ export default {
       localStorage.setItem("sessionId", id);
       await stripe.redirectToCheckout({ sessionId: id });
 
-      // După plată, setează starea și localStorage
       this.hasPaid = true;
       localStorage.setItem("hasPaid", "true");
       localStorage.setItem("paymentTimestamp", new Date().getTime());
     } catch (error) {
       console.error("Error during payment:", error.message);
+    }
+  },
+  initializeFreeAccess() {
+    const freeAccessTimestamp = localStorage.getItem("freeAccessTimestamp");
+    if (!freeAccessTimestamp) {
+      const currentTime = new Date().getTime();
+      localStorage.setItem("freeAccessTimestamp", currentTime);
     }
   },
   validateFreeAccess() {
@@ -141,11 +147,10 @@ export default {
     }
   },
   validatePaywallOnLoad() {
-    this.initializeFreeAccess();
+    this.initializeFreeAccess(); // Apel corect către metoda adăugată
     this.validatePaymentTime();
     this.startPaywallTimer();
 
-    // Asigură sincronizarea stării cu localStorage
     const hasPaidFromStorage = localStorage.getItem("hasPaid") === "true";
     if (hasPaidFromStorage !== this.hasPaid) {
       this.hasPaid = hasPaidFromStorage;
