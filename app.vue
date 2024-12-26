@@ -86,7 +86,7 @@ export default {
       freeAccessActive: true, // Controlează dacă timpul gratuit este activ
       currentBackground: "https://i.giphy.com/fygfeYhDOPrhTOHZ7v.webp",
       activeDescription: null,
-      freeAccessTimeLeft: 60, // Timp gratuit (60 secunde)
+      freeAccessTimeLeft: 200, // Timp gratuit (60 secunde)
       paidAccessTimeLeft: 0, // Timp plătit (în secunde)
       timerId: null
     };
@@ -151,13 +151,13 @@ export default {
       const elapsedSeconds = (Date.now() - freeAccessTimestamp) / 1000;
 
       // Dacă au trecut 60 de secunde, marchem accesul gratuit ca folosit
-      if (elapsedSeconds >= 20) {
+      if (elapsedSeconds >= 200) {
         localStorage.setItem("freeAccessUsed", "true");
         this.freeAccessActive = false; 
         this.freeAccessTimeLeft = 0;
       } else {
         // Actualizăm timpul gratuit rămas
-        this.freeAccessTimeLeft = 20 - Math.floor(elapsedSeconds);
+        this.freeAccessTimeLeft = 200 - Math.floor(elapsedSeconds);
         this.freeAccessActive = true;
       }
     },
