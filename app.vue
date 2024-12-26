@@ -173,23 +173,23 @@ export default {
       }
     },
     validatePaymentTime() {
-      const paymentTimestamp = localStorage.getItem("paymentTimestamp");
-      if (paymentTimestamp) {
-        const currentTime = new Date().getTime();
-        const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
+  const paymentTimestamp = localStorage.getItem("paymentTimestamp");
+  if (paymentTimestamp) {
+    const currentTime = new Date().getTime();
+    const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
 
-        if (elapsedSeconds >= 60) {
-          this.hasPaid = false;
-          localStorage.setItem("hasPaid", "false");
-          localStorage.removeItem("paymentTimestamp");
-        } else {
-          this.hasPaid = true;
-          localStorage.setItem("hasPaid", "true");
-        }
-      } else {
-        this.validateFreeAccess();
-      }
-    },
+    if (elapsedSeconds >= 60) {
+      this.hasPaid = false;
+      localStorage.setItem("hasPaid", "false");
+      localStorage.removeItem("paymentTimestamp");
+    } else {
+      this.hasPaid = true; // Plata are prioritate
+      localStorage.setItem("hasPaid", "true");
+    }
+  } else if (!this.hasPaid) {
+    this.validateFreeAccess();
+  }
+},
     validatePaywallOnLoad() {
       this.initializeFreeAccess();
       this.validatePaymentTime();
@@ -226,7 +226,6 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
-  verflow-x: hidden;
 }
 .container {
   display: flex;
@@ -234,16 +233,11 @@ html, body {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-color: rgba(141, 0, 96, 0.7);
-  background-position: center;
-  background-repeat: no-repeat;
-  margin: 0;
-  padding: 0;
-  position: relative;
-  color: white;
-  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+  height: 100%;;
+  background-size: cover; /* Fundalul să acopere complet */
+  background-position: center; /* Fundalul centrat */
+  background-repeat: no-repeat; /* Fără repetare */
+  background-color: #5c2478; /* Fundal fallback */
 }
 
 .header {
