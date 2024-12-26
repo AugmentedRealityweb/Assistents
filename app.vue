@@ -63,7 +63,7 @@ export default {
           background: "https://i.giphy.com/1qQ5lOKrgpai8EWGlo.webp",
           circleImage: "./poza3.png",
           description:
-            "Alexandra este o enigmă fascinantă - cu o voce blândă care îți atinge sufletul și îți aprinde imaginația. Fiecare frază este o invitație către un joc seducător."
+            "Delia este o enigmă fascinantă - cu o voce blândă care îți atinge sufletul și îți aprinde imaginația. Fiecare frază este o invitație către un joc seducător."
         },
         {
           id: "EU4z5Ma0f0dHLY6m9KSq",
