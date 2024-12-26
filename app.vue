@@ -158,9 +158,9 @@ export default {
         const currentTime = new Date().getTime();
         const elapsedSeconds = (currentTime - freeAccessTimestamp) / 1000;
 
-        this.freeAccessTimeLeft = Math.max(200 - Math.floor(elapsedSeconds), 0);
+        this.freeAccessTimeLeft = Math.max(60 - Math.floor(elapsedSeconds), 0);
 
-        if (elapsedSeconds >= 200) {
+        if (elapsedSeconds >= 60) {
           this.hasPaid = false;
           localStorage.setItem("hasPaid", "false");
         } else {
@@ -178,7 +178,7 @@ export default {
         const currentTime = new Date().getTime();
         const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
 
-        if (elapsedSeconds >= 200) {
+        if (elapsedSeconds >= 60) {
           this.hasPaid = false;
           localStorage.setItem("hasPaid", "false");
           localStorage.removeItem("paymentTimestamp");
@@ -226,16 +226,17 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
+  verflow-x: hidden;
 }
 .container {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   background-size: cover;
-  background-color: #5c2478;
+  background-color: rgba(141, 0, 96, 0.7);
   background-position: center;
   background-repeat: no-repeat;
   margin: 0;
