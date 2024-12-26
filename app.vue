@@ -173,22 +173,23 @@ export default {
       }
     },
     validatePaymentTime() {
-      const paymentTimestamp = localStorage.getItem("paymentTimestamp");
-      if (paymentTimestamp) {
-        const currentTime = new Date().getTime();
-        const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
+  const paymentTimestamp = localStorage.getItem("paymentTimestamp");
+  if (paymentTimestamp) {
+    const currentTime = new Date().getTime();
+    const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
 
-        if (elapsedSeconds >= 60) {
-          this.hasPaid = false;
-          localStorage.setItem("hasPaid", "false");
-          localStorage.removeItem("paymentTimestamp");
-        } else {
-          this.hasPaid = true;
-          localStorage.setItem("hasPaid", "true");
-        }
-      } else {
-        this.validateFreeAccess();
-      }
+    if (elapsedSeconds >= 60) {
+      this.hasPaid = false;
+      localStorage.setItem("hasPaid", "false");
+      localStorage.removeItem("paymentTimestamp");
+    } else {
+      this.hasPaid = true;
+      localStorage.setItem("hasPaid", "true");
+      return; // Evită validarea accesului gratuit
+    }
+  }
+  this.validateFreeAccess(); // Este verificat doar dacă nu există plată
+}
     },
     validatePaywallOnLoad() {
       this.initializeFreeAccess();
