@@ -63,12 +63,12 @@ export default {
           background: "https://i.giphy.com/1qQ5lOKrgpai8EWGlo.webp",
           circleImage: "./poza3.png",
           description:
-            "Delia este o enigmă fascinantă - cu o voce blândă care îți atinge sufletul și îți aprinde imaginația. Fiecare frază este o invitație către un joc seducător."
+            "Alexandra este o enigmă fascinantă - cu o voce blândă care îți atinge sufletul și îți aprinde imaginația. Fiecare frază este o invitație către un joc seducător."
         },
         {
-          id: "https://i.giphy.com/NzavBMIQ3CGxtMlOcv.webp",
+          id: "EU4z5Ma0f0dHLY6m9KSq",
           visible: false,
-          background: "https://i.giphy.com/tY3S7GJlVOyhO0TOid.webp",
+          background: "https://i.giphy.com/NzavBMIQ3CGxtMlOcv.webp",
           circleImage: "./poza4.png",
           description:
             "Patricia are un farmec irezistibil -  cu o voce care îți șoptește promisiuni subtile și te poartă într-o lume unde totul pare posibil. Jucăușă și fermecătoare."
@@ -86,7 +86,7 @@ export default {
       freeAccessActive: true, // Controlează dacă timpul gratuit este activ
       currentBackground: "https://i.giphy.com/fygfeYhDOPrhTOHZ7v.webp",
       activeDescription: null,
-      freeAccessTimeLeft: 30, // Timp gratuit (60 secunde)
+      freeAccessTimeLeft: 60, // Timp gratuit (60 secunde)
       paidAccessTimeLeft: 0, // Timp plătit (în secunde)
       timerId: null
     };
@@ -151,13 +151,13 @@ export default {
       const elapsedSeconds = (Date.now() - freeAccessTimestamp) / 1000;
 
       // Dacă au trecut 60 de secunde, marchem accesul gratuit ca folosit
-      if (elapsedSeconds >= 30) {
+      if (elapsedSeconds >= 20) {
         localStorage.setItem("freeAccessUsed", "true");
         this.freeAccessActive = false; 
         this.freeAccessTimeLeft = 0;
       } else {
         // Actualizăm timpul gratuit rămas
-        this.freeAccessTimeLeft = 30 - Math.floor(elapsedSeconds);
+        this.freeAccessTimeLeft = 20 - Math.floor(elapsedSeconds);
         this.freeAccessActive = true;
       }
     },
@@ -205,6 +205,8 @@ export default {
       if (elapsedSeconds >= 40) {
         this.hasPaid = false;
         localStorage.removeItem("paymentTimestamp");
+        // Ştergem și sessionId pentru a nu mai fi considerat "plătit" la refresh
+        localStorage.removeItem("sessionId");
         this.paidAccessTimeLeft = 0;
       } else {
         // Calculăm timpul plătit rămas
