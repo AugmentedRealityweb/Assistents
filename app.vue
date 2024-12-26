@@ -200,12 +200,14 @@ export default {
           console.error("Error during payment status check:", error.message);
           this.hasPaid = false;
         });
+      this.startPaywallTimer();
     },
     startPaywallTimer() {
       if (this.timerId) {
         clearInterval(this.timerId);
       }
       this.timerId = setInterval(() => {
+        this.validateFreeAccess();
         this.validatePaymentTime();
       }, 1000);
     }
