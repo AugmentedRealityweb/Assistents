@@ -1,18 +1,8 @@
 <template>
   <div id="app">
-    <div class="container" :style="{ backgroundImage: url(${currentBackground}) }">
+    <div class="container" :style="{ backgroundImage: `url(${currentBackground})` }">
       <div class="header">
-        <h1>Conversații Fierbinți
-        <span class="sparkle"></span>
-        <span class="sparkle"></span>
-        <span class="sparkle"></span>
-        <span class="sparkle"></span>
-        <span class="sparkle"></span>
-        <span class="sparkle"></span>
-        <span class="sparkle"></span>
-        <span class="sparkle"></span>
-        <span class="sparkle"></span>
-       </h1>
+        <h1>Conversții Fierbinți</h1>
         <p>Selectează un model pentru a începe conversația.</p>
       </div>
       <div class="paywall" v-if="!hasPaid">
@@ -64,12 +54,12 @@ export default {
           background: "https://i.giphy.com/1qQ5lOKrgpai8EWGlo.webp",
           circleImage: "./poza3.png",
           description:
-            "Delia este o enigmă fascinantă - cu o voce blândă care îți atinge sufletul și îți aprinde imaginația. Fiecare frază este o invitație către un joc seducător."
+            "Alexandra este o enigmă fascinantă - cu o voce blândă care îți atinge sufletul și îți aprinde imaginația. Fiecare frază este o invitație către un joc seducător."
         },
         {
           id: "EU4z5Ma0f0dHLY6m9KSq",
           visible: false,
-          background: "https://i.giphy.com/NzavBMIQ3CGxtMlOcv.webp",
+          background: "https://i.giphy.com/tY3S7GJlVOyhO0TOid.webp",
           circleImage: "./poza4.png",
           description:
             "Patricia are un farmec irezistibil -  cu o voce care îți șoptește promisiuni subtile și te poartă într-o lume unde totul pare posibil. Jucăușă și fermecătoare."
@@ -128,7 +118,7 @@ export default {
           return;
         }
 
-        const response = await fetch(/api/check-payment-status?sessionId=${sessionId});
+        const response = await fetch(`/api/check-payment-status?sessionId=${sessionId}`);
         const data = await response.json();
 
         if (data.hasPaid) {
@@ -158,9 +148,9 @@ export default {
         const currentTime = new Date().getTime();
         const elapsedSeconds = (currentTime - freeAccessTimestamp) / 1000;
 
-        this.freeAccessTimeLeft = Math.max(10 - Math.floor(elapsedSeconds), 0);
+        this.freeAccessTimeLeft = Math.max(60 - Math.floor(elapsedSeconds), 0);
 
-        if (elapsedSeconds >= 10) {
+        if (elapsedSeconds >= 60) {
           this.hasPaid = false;
           localStorage.setItem("hasPaid", "false");
         } else {
@@ -173,23 +163,22 @@ export default {
       }
     },
     validatePaymentTime() {
-  const paymentTimestamp = localStorage.getItem("paymentTimestamp");
-  if (paymentTimestamp) {
-    const currentTime = new Date().getTime();
-    const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
+      const paymentTimestamp = localStorage.getItem("paymentTimestamp");
+      if (paymentTimestamp) {
+        const currentTime = new Date().getTime();
+        const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
 
-    if (elapsedSeconds >= 60) {
-      this.hasPaid = false;
-      localStorage.setItem("hasPaid", "false");
-      localStorage.removeItem("paymentTimestamp");
-    } else {
-      this.hasPaid = true;
-      localStorage.setItem("hasPaid", "true");
-      return; // Evită validarea accesului gratuit
-    }
-  }
-  this.validateFreeAccess(); // Este verificat doar dacă nu există plată
-}
+        if (elapsedSeconds >= 30) {
+          this.hasPaid = false;
+          localStorage.setItem("hasPaid", "false");
+          localStorage.removeItem("paymentTimestamp");
+        } else {
+          this.hasPaid = true;
+          localStorage.setItem("hasPaid", "true");
+        }
+      } else {
+        this.validateFreeAccess();
+      }
     },
     validatePaywallOnLoad() {
       this.initializeFreeAccess();
@@ -244,86 +233,7 @@ export default {
   font-size: 2.5rem;
   margin: 0;
   color: rgba(247, 0, 44, 0.8);
-  position: relative;
-  overflow: visible; /* Permitem punctelor să iasă în afara textului */
 }
-
-.header h1 .sparkle {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background: radial-gradient(circle, rgba(245, 39, 145, 0.15) 0%, rgba(245, 39, 145, 0) 70%);
-  border-radius: 50%;
-  animation: sparkleAnimation 3s infinite ease-in-out;
-  opacity: 0; /* Începem cu punctul ascuns */
-  pointer-events: none;
-}
-
-/* Poziționarea punctelor aleatorii */
-.header h1 .sparkle:nth-child(1) {
-  top: 10%;
-  left: 20%;
-  animation-delay: 0.2s;
-}
-
-.header h1 .sparkle:nth-child(2) {
-  top: 30%;
-  left: 60%;
-  animation-delay: 1s;
-}
-
-.header h1 .sparkle:nth-child(3) {
-  top: 50%;
-  left: 40%;
-  animation-delay: 1.5s;
-}
-
-.header h1 .sparkle:nth-child(4) {
-  top: 70%;
-  left: 80%;
-  animation-delay: 2s;
-}
-
-.header h1 .sparkle:nth-child(5) {
-  top: 85%;
-  left: 10%;
-  animation-delay: 2.5s;
-}
-
-  .header h1 .sparkle:nth-child(2) {
-  top: 65%;
-  left: 20%;
-  animation-delay: 1.4s;
-}
-
-  header h1 .sparkle:nth-child(2) {
-  top: 25%;
-  left: 50%;
-  animation-delay: 1s;
-}
-
-  header h1 .sparkle:nth-child(2) {
-  top: 38%;
-  left: 10%;
-  animation-delay: 0.2s;
-}
-
-  header h1 .sparkle:nth-child(2) {
-  top: 52%;
-  left: 60%;
-  animation-delay: 1.3s;
-}
-/* Animația pentru aprinderea și stingerea licuricilor */
-@keyframes sparkleAnimation {
-  0%, 100% {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.2);
-  }
-}/* Aici era problema: animația trebuie închisă! */
 
 .header p {
   font-size: 1.2rem;
@@ -335,7 +245,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: rgba(245, 39, 145, 0.15);
+  background: rgba(0, 0, 0, 0.8);
   color: white;
   padding: 20px;
   border-radius: 10px;
@@ -409,13 +319,13 @@ export default {
 
 .free-access-message {
   position: fixed;
-  bottom: 5px;
+  bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(245, 39, 145, 0.15);
+  background: rgba(0, 0, 0, 0.8);
   color: white;
   padding: 10px 20px;
-  border-radius: 15px;
+  border-radius: 5px;
   font-size: 16px;
   z-index: 1000;
   text-align: center;
