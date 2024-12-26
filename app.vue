@@ -184,6 +184,7 @@ export default {
     },
     validatePaywallOnLoad() {
       this.initializeFreeAccess();
+      this.checkPaymentStatus(); // Verificăm plata înainte de validarea timpului
       this.validatePaymentTime();
       this.startPaywallTimer();
     },
@@ -204,7 +205,6 @@ export default {
     document.body.appendChild(script);
 
     this.validatePaywallOnLoad();
-    this.checkPaymentStatus(); // Verificăm plata imediat ce componenta este montată
   }
 };
 </script>
