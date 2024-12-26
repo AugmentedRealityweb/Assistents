@@ -2,7 +2,7 @@
   <div id="app">
     <div class="container" :style="{ backgroundImage: `url(${currentBackground})` }">
       <div class="header">
-        <h1>Conversții Fierbinți</h1>
+        <h1>Conversații Fierbinți</h1>
         <p>Selectează un model pentru a începe conversația.</p>
       </div>
       <div class="paywall" v-if="!hasPaid">
@@ -138,13 +138,21 @@ export default {
       }
     },
     initializeFreeAccess() {
-      const freeAccessTimestamp = localStorage.getItem("freeAccessTimestamp");
-      if (!freeAccessTimestamp) {
+      const freeAccessUsed = localStorage.getItem("freeAccessUsed");
+      if (!freeAccessUsed) {
+        // Prima vizită: setăm timestamp pentru acces gratuit
         const currentTime = new Date().getTime();
         localStorage.setItem("freeAccessTimestamp", currentTime);
+        localStorage.setItem("freeAccessUsed", "false");
       }
     },
     validateFreeAccess() {
+      const freeAccessUsed = localStorage.getItem("freeAccessUsed");
+      if (freeAccessUsed === "true") {
+        this.freeAccessTimeLeft = 0; // Accesul gratuit a fost utilizat deja
+        return;
+      }
+
       const freeAccessTimestamp = localStorage.getItem("freeAccessTimestamp");
       if (freeAccessTimestamp) {
         const currentTime = new Date().getTime();
@@ -154,6 +162,7 @@ export default {
 
         if (elapsedSeconds >= 60) {
           this.hasPaid = false;
+          localStorage.setItem("freeAccessUsed", "true"); // Accesul gratuit a expirat
           localStorage.setItem("hasPaid", "false");
         } else {
           this.hasPaid = true;
@@ -184,6 +193,7 @@ export default {
     },
     validatePaywallOnLoad() {
       this.initializeFreeAccess();
+      this.checkPaymentStatus(); // Verificăm plata înainte de validarea timpului
       this.validatePaymentTime();
       this.startPaywallTimer();
     },
@@ -204,7 +214,6 @@ export default {
     document.body.appendChild(script);
 
     this.validatePaywallOnLoad();
-    this.checkPaymentStatus(); // Verificăm plata imediat ce componenta este montată
   }
 };
 </script>
