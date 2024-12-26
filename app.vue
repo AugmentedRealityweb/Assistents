@@ -194,6 +194,7 @@ mounted() {
     // Inițializare completă
     this.validatePaywallOnLoad();
 }
+}
 };
 </script>
 
