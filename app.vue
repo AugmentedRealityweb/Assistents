@@ -25,7 +25,6 @@
           <p>{{ activeDescription }}</p>
         </div>
       </div>
-      <!-- Mesaj pentru timpul rămas -->
       <div v-if="freeAccessTimeLeft > 0" class="free-access-message">
         Free access for {{ freeAccessTimeLeft }} seconds
       </div>
@@ -129,18 +128,18 @@ export default {
           this.freeAccessTimeLeft = 0; // Dezactivăm accesul gratuit
         } else {
           this.hasPaid = false;
+          localStorage.setItem("hasPaid", "false");
           localStorage.removeItem("sessionId");
         }
       } catch (error) {
         console.error("Error checking payment status:", error.message);
         this.hasPaid = false;
-        localStorage.removeItem("sessionId");
+        localStorage.setItem("hasPaid", "false");
       }
     },
     initializeFreeAccess() {
       const freeAccessUsed = localStorage.getItem("freeAccessUsed");
       if (!freeAccessUsed) {
-        // Prima vizită: setăm timestamp pentru acces gratuit
         const currentTime = new Date().getTime();
         localStorage.setItem("freeAccessTimestamp", currentTime);
         localStorage.setItem("freeAccessUsed", "false");
@@ -149,7 +148,7 @@ export default {
     validateFreeAccess() {
       const freeAccessUsed = localStorage.getItem("freeAccessUsed");
       if (freeAccessUsed === "true") {
-        this.freeAccessTimeLeft = 0; // Accesul gratuit a fost utilizat deja
+        this.freeAccessTimeLeft = 0;
         return;
       }
 
@@ -162,7 +161,7 @@ export default {
 
         if (elapsedSeconds >= 60) {
           this.hasPaid = false;
-          localStorage.setItem("freeAccessUsed", "true"); // Accesul gratuit a expirat
+          localStorage.setItem("freeAccessUsed", "true");
           localStorage.setItem("hasPaid", "false");
         } else {
           this.hasPaid = true;
@@ -193,9 +192,14 @@ export default {
     },
     validatePaywallOnLoad() {
       this.initializeFreeAccess();
-      this.checkPaymentStatus(); // Verificăm plata înainte de validarea timpului
-      this.validatePaymentTime();
-      this.startPaywallTimer();
+      this.checkPaymentStatus()
+        .then(() => {
+          this.validatePaymentTime();
+        })
+        .catch((error) => {
+          console.error("Error during payment status check:", error.message);
+          this.hasPaid = false;
+        });
     },
     startPaywallTimer() {
       if (this.timerId) {
