@@ -81,54 +81,89 @@ export default {
     };
   },
   methods: {
-  async handlePayment() {
-    const stripe = await loadStripe(
-      "pk_live_51LhHVFJOzg3eyu5LJRnplRv2AKh0MGJEew4HhNbn3Eu2LfJkbZUv2j4lFNxulY5ugbb6wrh07QCaX0djdFnQ8f7A00tyuYKXEL"
-    );
+    toggleWidget(index) {
+        this.agents.forEach((agent, idx) => {
+            agent.visible = idx === index ? !agent.visible : false;
+            if (agent.visible) {
+                this.currentBackground = agent.background;
+                this.activeDescription = agent.description;
+            }
+        });
+    },
+    async handlePayment() {
+        const stripe = await loadStripe(
+            "pk_live_51LhHVFJOzg3eyu5LJRnplRv2AKh0MGJEew4HhNbn3Eu2LfJkbZUv2j4lFNxulY5ugbb6wrh07QCaX0djdFnQ8f7A00tyuYKXEL"
+        );
 
-    try {
-      const response = await fetch("/api/create-checkout-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
+        try {
+            const response = await fetch("/api/create-checkout-session", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            });
 
-      const { id } = await response.json();
-      if (!id) throw new Error("Session ID not received.");
-      localStorage.setItem("sessionId", id);
-      await stripe.redirectToCheckout({ sessionId: id });
+            const { id } = await response.json();
+            if (!id) throw new Error("Session ID not received.");
+            localStorage.setItem("sessionId", id);
+            await stripe.redirectToCheckout({ sessionId: id });
+        } catch (error) {
+            console.error("Error during payment:", error.message);
+        }
+    },
+    async checkPaymentStatus() {
+        try {
+            const sessionId = localStorage.getItem("sessionId");
+            if (!sessionId) {
+                console.error("Session ID is missing.");
+                this.hasPaid = false;
+                return;
+            }
 
-      this.hasPaid = true;
-      localStorage.setItem("hasPaid", "true");
-      localStorage.setItem("paymentTimestamp", new Date().getTime());
-    } catch (error) {
-      console.error("Error during payment:", error.message);
-    }
-  },
-  initializeFreeAccess() {
-    const freeAccessTimestamp = localStorage.getItem("freeAccessTimestamp");
-    if (!freeAccessTimestamp) {
-      const currentTime = new Date().getTime();
-      localStorage.setItem("freeAccessTimestamp", currentTime);
-    }
-  },
-  validateFreeAccess() {
-    const freeAccessTimestamp = localStorage.getItem("freeAccessTimestamp");
-    if (freeAccessTimestamp) {
-      const currentTime = new Date().getTime();
-      const elapsedSeconds = (currentTime - freeAccessTimestamp) / 1000;
+            const response = await fetch(`/api/check-payment-status?sessionId=${sessionId}`);
+            const data = await response.json();
 
-      this.freeAccessTimeLeft = Math.max(30 - Math.floor(elapsedSeconds), 0);
+            if (data.hasPaid) {
+                this.hasPaid = true;
+                const paymentTimestamp = new Date().getTime();
+                localStorage.setItem("paymentTimestamp", paymentTimestamp);
+            } else {
+                this.hasPaid = false;
+                localStorage.removeItem("sessionId");
+            }
+        } catch (error) {
+            console.error("Error checking payment status:", error.message);
+            this.hasPaid = false;
+            localStorage.removeItem("sessionId");
+        }
+    },
+    initializeFreeAccess() {
+        const freeAccessTimestamp = localStorage.getItem("freeAccessTimestamp");
+        if (!freeAccessTimestamp) {
+            // Dacă nu există un timestamp, setăm unul nou
+            const currentTime = new Date().getTime();
+            localStorage.setItem("freeAccessTimestamp", currentTime);
+        }
+    },
+    validateFreeAccess() {
+        const freeAccessTimestamp = localStorage.getItem("freeAccessTimestamp");
+        if (freeAccessTimestamp) {
+            const currentTime = new Date().getTime();
+            const elapsedSeconds = (currentTime - freeAccessTimestamp) / 1000;
 
-      if (elapsedSeconds >= 30) {
-        this.hasPaid = false;
-        localStorage.setItem("hasPaid", "false");
-      } else {
-        this.hasPaid = true;
-        localStorage.setItem("hasPaid", "true");
-      }
-    }
-  },
-  methods: {
+            if (elapsedSeconds >= 60) {
+                // Free access a expirat, aplicăm paywall-ul
+                this.hasPaid = false;
+                localStorage.setItem("hasPaid", "false");
+            } else {
+                // Free access este activ
+                this.hasPaid = true;
+                localStorage.setItem("hasPaid", "true");
+            }
+        } else {
+            // Dacă nu există timestamp, aplicăm paywall-ul
+            this.hasPaid = false;
+            localStorage.setItem("hasPaid", "false");
+        }
+    },
     validatePaymentTime() {
         const paymentTimestamp = localStorage.getItem("paymentTimestamp");
         if (paymentTimestamp) {
@@ -136,43 +171,27 @@ export default {
             const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
 
             if (elapsedSeconds >= 30) {
-                // Timpul a expirat, paywall-ul trebuie activat
+                // Timpul a expirat, activăm paywall-ul
                 this.hasPaid = false;
                 localStorage.setItem("hasPaid", "false");
                 localStorage.removeItem("paymentTimestamp");
             } else {
-                // Timpul nu a expirat, utilizatorul are acces
+                // Plata este activă, utilizatorul are acces
                 this.hasPaid = true;
                 localStorage.setItem("hasPaid", "true");
             }
         } else {
-            // Nu există timestamp, paywall-ul trebuie activat
-            this.hasPaid = false;
-            localStorage.setItem("hasPaid", "false");
+            this.validateFreeAccess(); // Validăm accesul gratuit dacă nu există un paymentTimestamp
         }
     },
     validatePaywallOnLoad() {
-        // Validare imediată a stării fără a aștepta intervalul
-        const paymentTimestamp = localStorage.getItem("paymentTimestamp");
-        if (paymentTimestamp) {
-            const currentTime = new Date().getTime();
-            const elapsedSeconds = (currentTime - paymentTimestamp) / 1000;
+        // Inițializăm accesul gratuit dacă este prima vizită
+        this.initializeFreeAccess();
 
-            if (elapsedSeconds >= 30) {
-                // Timpul a expirat, paywall-ul trebuie activat
-                this.hasPaid = false;
-                localStorage.setItem("hasPaid", "false");
-                localStorage.removeItem("paymentTimestamp");
-            } else {
-                this.hasPaid = true;
-                localStorage.setItem("hasPaid", "true");
-            }
-        } else {
-            this.hasPaid = false;
-            localStorage.setItem("hasPaid", "false");
-        }
+        // Validăm starea paywall-ului
+        this.validatePaymentTime();
 
-        // Pornire timer pentru verificări continue
+        // Pornim un timer pentru verificări continue
         this.startPaywallTimer();
     },
     startPaywallTimer() {
