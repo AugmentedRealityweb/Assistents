@@ -73,9 +73,10 @@ export default {
         }
       ],
       hasPaid: false,
+      freeAccessActive: true, // Adăugat pentru a controla dacă timpul gratuit este activ
       currentBackground: "https://i.giphy.com/fygfeYhDOPrhTOHZ7v.webp",
       activeDescription: null,
-      freeAccessTimeLeft: 0,
+      freeAccessTimeLeft: 60,
       paidAccessTimeLeft: 0,
       timerId: null
     };
@@ -118,6 +119,7 @@ export default {
     validateFreeAccess() {
       const freeAccessUsed = localStorage.getItem("freeAccessUsed");
       if (freeAccessUsed === "true") {
+        this.freeAccessActive = false; // Accesul gratuit s-a terminat
         this.freeAccessTimeLeft = 0;
         return;
       }
@@ -127,9 +129,11 @@ export default {
 
       if (elapsedSeconds >= 60) {
         localStorage.setItem("freeAccessUsed", "true");
+        this.freeAccessActive = false; // Oprire acces gratuit
         this.freeAccessTimeLeft = 0;
       } else {
         this.freeAccessTimeLeft = 60 - Math.floor(elapsedSeconds);
+        this.freeAccessActive = true; // Acces gratuit activ
       }
     },
     async checkPaymentStatus() {
@@ -188,7 +192,9 @@ export default {
 
       this.timerId = setInterval(() => {
         this.validateFreeAccess();
-        this.validatePaidAccess();
+        if (!this.freeAccessActive) {
+          this.validatePaidAccess();
+        }
       }, 1000);
     }
   },
@@ -203,7 +209,6 @@ export default {
   }
 };
 </script>
-
 
 <style scoped>
 .container {
