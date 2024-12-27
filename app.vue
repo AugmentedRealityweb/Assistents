@@ -100,7 +100,7 @@ export default {
       freeAccessActive: true,
       currentBackground: "https://i.giphy.com/fygfeYhDOPrhTOHZ7v.webp",
       activeDescription: null,
-      freeAccessTimeLeft: 200, // Timp gratuit (200 secunde ca exemplu)
+      freeAccessTimeLeft: 30, // Timp gratuit (200 secunde ca exemplu)
       paidAccessTimeLeft: 0,   // Timp plătit (în secunde)
       timerId: null,
 
@@ -166,7 +166,7 @@ export default {
 
       const freeAccessTimestamp = localStorage.getItem("freeAccessTimestamp");
       const elapsedSeconds = (Date.now() - freeAccessTimestamp) / 1000;
-      const totalFree = 200; // 200 secunde ca exemplu
+      const totalFree = 30; // 200 secunde ca exemplu
 
       if (elapsedSeconds >= totalFree) {
         localStorage.setItem("freeAccessUsed", "true");
@@ -214,7 +214,7 @@ export default {
 
       const elapsedSeconds = (Date.now() - paymentTimestamp) / 1000;
       // exemplu: 40 secunde în loc de 300, pentru test
-      const totalPaid = 40;
+      const totalPaid = 300;
 
       if (elapsedSeconds >= totalPaid) {
         this.hasPaid = false;
