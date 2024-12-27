@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <div class="container" :style="{ backgroundImage: `url(${currentBackground})` }">
+    <div
+      class="container"
+      :style="{ backgroundImage: `url(${currentBackground})` }"
+    >
       <div class="header">
         <h1>Conversații Fierbinți</h1>
         <p>Selectează un model pentru a începe conversația.</p>
@@ -38,6 +41,9 @@
       <div v-if="freeAccessTimeLeft > 0" class="free-access-message">
         Free access for {{ freeAccessTimeLeft }} seconds
       </div>
+
+      <!-- Canvas pentru fulgi de zăpadă -->
+      <canvas id="snow-canvas"></canvas>
     </div>
   </div>
 </template>
@@ -86,9 +92,17 @@ export default {
       freeAccessActive: true, // Controlează dacă timpul gratuit este activ
       currentBackground: "https://i.giphy.com/fygfeYhDOPrhTOHZ7v.webp",
       activeDescription: null,
-      freeAccessTimeLeft: 200, // Timp gratuit (60 secunde)
+      freeAccessTimeLeft: 200, // Timp gratuit (ex. 200 secunde)
       paidAccessTimeLeft: 0, // Timp plătit (în secunde)
-      timerId: null
+      timerId: null,
+
+      // ----- Variabile pentru fulgii de zăpadă -----
+      snowflakes: [],
+      snowCanvas: null,
+      snowCtx: null,
+      orientationGamma: 0, // orientarea stânga-dreapta
+      orientationBeta: 0,  // orientarea față-spate
+      numFlakes: 40        // numărul de fulgi
     };
   },
   methods: {
@@ -150,13 +164,12 @@ export default {
       const freeAccessTimestamp = localStorage.getItem("freeAccessTimestamp");
       const elapsedSeconds = (Date.now() - freeAccessTimestamp) / 1000;
 
-      // Dacă au trecut 60 de secunde, marchem accesul gratuit ca folosit
+      // Exemplu: dacă userul are 200 secunde de free access
       if (elapsedSeconds >= 200) {
         localStorage.setItem("freeAccessUsed", "true");
-        this.freeAccessActive = false; 
+        this.freeAccessActive = false;
         this.freeAccessTimeLeft = 0;
       } else {
-        // Actualizăm timpul gratuit rămas
         this.freeAccessTimeLeft = 200 - Math.floor(elapsedSeconds);
         this.freeAccessActive = true;
       }
@@ -172,7 +185,9 @@ export default {
       }
 
       try {
-        const response = await fetch(`/api/check-payment-status?sessionId=${sessionId}`);
+        const response = await fetch(
+          `/api/check-payment-status?sessionId=${sessionId}`
+        );
         const data = await response.json();
 
         if (data.hasPaid) {
@@ -201,7 +216,7 @@ export default {
 
       const elapsedSeconds = (Date.now() - paymentTimestamp) / 1000;
 
-      // Dacă au trecut 300 de secunde (5 minute) de la plata anterioară, accesul plătit expiră
+      // Aici am pus 40 secunde doar ca exemplu de test, real ar fi 300 sec.
       if (elapsedSeconds >= 40) {
         this.hasPaid = false;
         localStorage.removeItem("paymentTimestamp");
@@ -209,26 +224,89 @@ export default {
         localStorage.removeItem("sessionId");
         this.paidAccessTimeLeft = 0;
       } else {
-        // Calculăm timpul plătit rămas
         this.paidAccessTimeLeft = 40 - Math.floor(elapsedSeconds);
       }
+    },
+
+    // -------------- FULGII DE ZĂPADĂ --------------
+    initSnowflakes() {
+      // Preluăm canvas-ul și context-ul
+      this.snowCanvas = document.getElementById("snow-canvas");
+      this.snowCtx = this.snowCanvas.getContext("2d");
+
+      // Redimensionăm canvas-ul la dimensiunea ferestrei
+      this.snowCanvas.width = window.innerWidth;
+      this.snowCanvas.height = window.innerHeight;
+
+      // Cream un anumit număr de fulgi
+      for (let i = 0; i < this.numFlakes; i++) {
+        this.snowflakes.push(this.createSnowflake());
+      }
+    },
+    createSnowflake() {
+      // Cream un fulg random, cu poziție și viteză random
+      return {
+        x: Math.random() * window.innerWidth, // poziție inițială random pe axa X
+        y: Math.random() * window.innerHeight, // poziție inițială random pe axa Y
+        radius: Math.random() * 4 + 1, // rază între 1 și 5
+        speedX: Math.random() * 1 - 0.5, // viteză orizontală ușor aleatoare
+        speedY: Math.random() * 2 + 1 // viteză verticală între 1 și 3
+      };
+    },
+    updateSnowflakes() {
+      this.snowCtx.clearRect(0, 0, this.snowCanvas.width, this.snowCanvas.height);
+
+      for (let i = 0; i < this.snowflakes.length; i++) {
+        const flake = this.snowflakes[i];
+
+        // Actualizăm poziția fulgilor cu un mic offset din orientarea telefonului
+        // gamma: rotire stânga-dreapta, beta: rotire față-spate
+        flake.x += flake.speedX + this.orientationGamma;
+        flake.y += flake.speedY + this.orientationBeta;
+
+        // Dacă ies din ecran pe verticală, le resetăm poziția
+        if (flake.y > window.innerHeight) {
+          flake.y = -flake.radius;
+          flake.x = Math.random() * window.innerWidth;
+        }
+        // Dacă ies din stânga/dreapta, apar pe cealaltă parte
+        if (flake.x > window.innerWidth) {
+          flake.x = 0;
+        } else if (flake.x < 0) {
+          flake.x = window.innerWidth;
+        }
+
+        // Desenăm fulgul
+        this.drawFlake(flake);
+      }
+
+      // Loop-ul de animație
+      requestAnimationFrame(this.updateSnowflakes);
+    },
+    drawFlake(flake) {
+      this.snowCtx.beginPath();
+      this.snowCtx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+      this.snowCtx.fillStyle = "white";
+      this.snowCtx.fill();
+    },
+    handleDeviceOrientation(event) {
+      // Scalează valorile la ceva mai mic, pentru a nu fi prea violent
+      this.orientationGamma = event.gamma / 50; // stânga-dreapta
+      this.orientationBeta = event.beta / 200;  // față-spate
     },
 
     // Inițierea validărilor la încărcarea paginii
     validatePaywallOnLoad() {
       // Inițializăm starea accesului gratuit (o singură dată per utilizator)
       this.initializeFreeAccess();
-
       // Verificăm dacă accesul gratuit este încă valabil
       this.validateFreeAccess();
-
       // Dacă accesul gratuit a expirat, verificăm plata
       if (!this.freeAccessActive) {
         this.checkPaymentStatus().then(() => {
           this.validatePaidAccess();
         });
       }
-
       // Pornim un timer care validează permanent starea paywall-ului
       this.startPaywallTimer();
     },
@@ -261,6 +339,29 @@ export default {
 
     // Facem validările și pornim timerul
     this.validatePaywallOnLoad();
+
+    // ---- Activăm fulgii de zăpadă ----
+    this.initSnowflakes();
+    // Legăm animația la `this`
+    this.updateSnowflakes = this.updateSnowflakes.bind(this);
+    requestAnimationFrame(this.updateSnowflakes);
+
+    // Ascultăm event-ul de orientare a dispozitivului
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener(
+        "deviceorientation",
+        this.handleDeviceOrientation,
+        true
+      );
+    } else {
+      console.log("DeviceOrientationEvent nu este suportat.");
+    }
+
+    // La resize, redimensionăm canvas-ul
+    window.addEventListener("resize", () => {
+      this.snowCanvas.width = window.innerWidth;
+      this.snowCanvas.height = window.innerHeight;
+    });
   }
 };
 </script>
@@ -299,6 +400,7 @@ export default {
   margin: 10px 0;
 }
 
+/* Paywall styling */
 .paywall {
   display: flex;
   flex-direction: column;
@@ -319,6 +421,7 @@ export default {
   cursor: pointer;
 }
 
+/* Container cu cercurile agenților */
 .circle-container {
   position: absolute;
   top: 20%;
@@ -388,5 +491,16 @@ export default {
   font-size: 16px;
   z-index: 1000;
   text-align: center;
+}
+
+/* Canvas pentru fulgi */
+#snow-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw; 
+  height: 100vh;
+  pointer-events: none; /* să nu încurce interacțiunea cu restul UI */
+  z-index: 2; /* deasupra background-ului, dar sub alte elemente interactive */
 }
 </style>
